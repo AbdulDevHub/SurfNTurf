@@ -3,16 +3,16 @@ using UnityEngine;
 public class HoverAndClickQuickOutline : MonoBehaviour
 {
     [Header("Cursor Textures")]
-    private Texture2D hoverCursor;
-    private Texture2D defaultCursor;
-    private Vector2 hotspot = Vector2.zero;
+    public Texture2D hoverCursor;
+    public Texture2D defaultCursor;
+    public Vector2 hotspot = Vector2.zero;
 
     private Outline lastHovered;
 
     void Start()
     {
         // Disable all Outline components in the scene initially
-        Outline[] outlines = FindObjectsOfType<Outline>();
+        Outline[] outlines = Object.FindObjectsByType<Outline>(FindObjectsSortMode.None);
         foreach (var o in outlines)
         {
             o.enabled = false;
