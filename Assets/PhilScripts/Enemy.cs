@@ -9,9 +9,16 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
 
     [Header("Stats")]
-    public int maxHealth = 10;
-    public float speed = 3.5f;
+    [SerializeField] private int maxHealth = 10;
+    [SerializeField] private float speed = 3.5f;
+    public string enemyName = "Enemy"; // Name to display in UI
+
     [HideInInspector] public int currentHealth;
+
+    // Public getters for UI access
+    public int MaxHealth => maxHealth;
+    public int CurrentHealth => currentHealth;
+    public float Speed => speed;
 
     private void Start()
     {

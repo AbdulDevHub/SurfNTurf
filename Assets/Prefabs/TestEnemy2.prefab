@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1776119477917916235}
   - component: {fileID: 4311311219726164899}
   - component: {fileID: 8015233181924822260}
+  - component: {fileID: -3318839053703433446}
   m_Layer: 0
   m_Name: TestEnemy2
   m_TagString: Untagged
@@ -394,4 +395,19 @@ MonoBehaviour:
   pathToFollow: {fileID: 0}
   maxHealth: 10
   speed: 6
+  enemyName: TestEnemy2
   currentHealth: 0
+--- !u!114 &-3318839053703433446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7017039098018598529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9355613f83c427f4abfe8f2010e22e67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHoverUI
+  enemyUIPrefab: {fileID: 6241168576661668550, guid: 71b3a74041489284a966e71794be74e0, type: 3}
+  offset: {x: 0, y: 1, z: 1}

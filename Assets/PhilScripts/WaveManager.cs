@@ -13,6 +13,8 @@ public class WaveManager : MonoBehaviour
 
     [Header("Settings")]
     public float timeBeforeFirstWave = 5f;
+    public float spawnInterval = 0.5f; // consistent spawn interval for all enemies
+
 
     private float countdown = 0f;
     private bool waveInProgress = false;
@@ -57,7 +59,7 @@ public class WaveManager : MonoBehaviour
                 if (enemy != null)
                     enemy.pathToFollow = path;
 
-                yield return new WaitForSeconds(group.enemyPrefab.GetComponent<Enemy>().speed / 2f); // optional pacing
+                yield return new WaitForSeconds(spawnInterval); // spawnInterval is a float defined in WaveManager
             }
         }
 
