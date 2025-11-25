@@ -617,7 +617,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   pathToFollow: {fileID: 0}
-  maxHealth: 10
+  maxHealth: 1
   speed: 5
   enemyName: TestEnemy3
   currentHealth: 0
@@ -657,3 +657,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHoverUI
   enemyUIPrefab: {fileID: 6241168576661668550, guid: 71b3a74041489284a966e71794be74e0, type: 3}
   offset: {x: 0, y: 1, z: 1}
+  scaleFactor: 0.1

@@ -11,10 +11,13 @@ public class WaveManager : MonoBehaviour
     public TMP_Text waveText;
     public TMP_Text countdownText;
 
+    [Header("Wave Message UI")]
+    public GameObject waveMessagePanel;   // UI Panel to show after wave
+    public TMP_Text waveMessageText;      // Text inside the panel
+
     [Header("Settings")]
     public float timeBeforeFirstWave = 5f;
-    public float spawnInterval = 0.5f; // consistent spawn interval for all enemies
-
+    public float spawnInterval = 0.5f;
 
     private float countdown = 0f;
     private bool waveInProgress = false;
@@ -24,6 +27,9 @@ public class WaveManager : MonoBehaviour
         countdown = timeBeforeFirstWave;
         UpdateWaveUI();
         UpdateCountdownUI();
+
+        if (waveMessagePanel != null)
+            waveMessagePanel.SetActive(false);
     }
 
     private void Update()
@@ -45,10 +51,11 @@ public class WaveManager : MonoBehaviour
     private IEnumerator SpawnWave(Wave wave)
     {
         waveInProgress = true;
-        countdownText.text = ""; // hide countdown during wave
+        countdownText.text = ""; 
 
-        UpdateWaveUI(); // show current wave number
+        UpdateWaveUI();
 
+        // Spawn all enemies in groups
         foreach (EnemyGroup group in wave.enemies)
         {
             for (int i = 0; i < group.count; i++)
@@ -59,7 +66,7 @@ public class WaveManager : MonoBehaviour
                 if (enemy != null)
                     enemy.pathToFollow = path;
 
-                yield return new WaitForSeconds(spawnInterval); // spawnInterval is a float defined in WaveManager
+                yield return new WaitForSeconds(spawnInterval);
             }
         }
 
@@ -67,7 +74,9 @@ public class WaveManager : MonoBehaviour
         while (EnemyManager.aliveEnemies > 0)
             yield return null;
 
-        // Wave finished
+        // Wave completed
+        StartCoroutine(HandleWaveCompletion(wave));
+
         waveIndex++;
         waveInProgress = false;
 
@@ -79,6 +88,29 @@ public class WaveManager : MonoBehaviour
         else
         {
             countdownText.text = "All waves completed!";
+        }
+    }
+
+    private IEnumerator HandleWaveCompletion(Wave wave)
+    {
+        // Only show UI if wave has a message
+        if (!string.IsNullOrWhiteSpace(wave.waveMessage) && waveMessagePanel != null)
+        {
+            waveMessagePanel.SetActive(true);
+
+            if (waveMessageText != null)
+                waveMessageText.text = wave.waveMessage;
+
+            // Use custom time if given; otherwise use delayAfterWave
+            // float showTime = (wave.messageDisplayTime > 0)
+            //     ? wave.messageDisplayTime
+            //     : wave.delayAfterWave;
+
+            float showTime = wave.delayAfterWave;
+
+            yield return new WaitForSeconds(showTime);
+
+            waveMessagePanel.SetActive(false);
         }
     }
 
