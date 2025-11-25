@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -12,8 +13,8 @@ public class WaveManager : MonoBehaviour
     public TMP_Text countdownText;
 
     [Header("Wave Message UI")]
-    public GameObject waveMessagePanel;   // UI Panel to show after wave
-    public TMP_Text waveMessageText;      // Text inside the panel
+    public GameObject waveMessagePanel;
+    public TMP_Text waveMessageText;
 
     [Header("Settings")]
     public float timeBeforeFirstWave = 5f;
@@ -51,30 +52,52 @@ public class WaveManager : MonoBehaviour
     private IEnumerator SpawnWave(Wave wave)
     {
         waveInProgress = true;
-        countdownText.text = ""; 
+        countdownText.text = "";
 
         UpdateWaveUI();
 
-        // Spawn all enemies in groups
+        // ---------------------------
+        // BUILD LIST OF ALL ENEMIES
+        // ---------------------------
+        List<GameObject> enemyPool = new List<GameObject>();
+
         foreach (EnemyGroup group in wave.enemies)
         {
             for (int i = 0; i < group.count; i++)
-            {
-                EnemyPath path = wave.availablePaths[Random.Range(0, wave.availablePaths.Length)];
-                GameObject enemyGO = Instantiate(group.enemyPrefab, path.GetSpawnPoint(), Quaternion.identity);
-                Enemy enemy = enemyGO.GetComponent<Enemy>();
-                if (enemy != null)
-                    enemy.pathToFollow = path;
-
-                yield return new WaitForSeconds(spawnInterval);
-            }
+                enemyPool.Add(group.enemyPrefab);
         }
 
-        // Wait until all enemies are dead
+        // ---------------------------
+        // SHUFFLE THE ENEMY LIST
+        // ---------------------------
+        for (int i = 0; i < enemyPool.Count; i++)
+        {
+            GameObject temp = enemyPool[i];
+            int rand = Random.Range(i, enemyPool.Count);
+            enemyPool[i] = enemyPool[rand];
+            enemyPool[rand] = temp;
+        }
+
+        // ---------------------------
+        // SPAWN SHUFFLED ENEMIES
+        // ---------------------------
+        foreach (GameObject prefab in enemyPool)
+        {
+            EnemyPath path = wave.availablePaths[Random.Range(0, wave.availablePaths.Length)];
+            GameObject enemyGO = Instantiate(prefab, path.GetSpawnPoint(), Quaternion.identity);
+
+            Enemy enemy = enemyGO.GetComponent<Enemy>();
+            if (enemy != null)
+                enemy.pathToFollow = path;
+
+            yield return new WaitForSeconds(spawnInterval);
+        }
+
+        // Wait for all enemies to die
         while (EnemyManager.aliveEnemies > 0)
             yield return null;
 
-        // Wave completed
+        // Handle wave completion UI message
         StartCoroutine(HandleWaveCompletion(wave));
 
         waveIndex++;
@@ -93,18 +116,12 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator HandleWaveCompletion(Wave wave)
     {
-        // Only show UI if wave has a message
         if (!string.IsNullOrWhiteSpace(wave.waveMessage) && waveMessagePanel != null)
         {
             waveMessagePanel.SetActive(true);
 
             if (waveMessageText != null)
                 waveMessageText.text = wave.waveMessage;
-
-            // Use custom time if given; otherwise use delayAfterWave
-            // float showTime = (wave.messageDisplayTime > 0)
-            //     ? wave.messageDisplayTime
-            //     : wave.delayAfterWave;
 
             float showTime = wave.delayAfterWave;
 
