@@ -5786,6 +5786,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 913797266}
+  - component: {fileID: 913797267}
   m_Layer: 0
   m_Name: map
   m_TagString: Untagged
@@ -5829,6 +5830,27 @@ Transform:
   - {fileID: 1252790612}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &913797267
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913797265}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 28.332375, y: 0.6792901, z: 48.799736}
+  m_Center: {x: -0.622427, y: -0.23737237, z: 5.0253563}
 --- !u!1 &921340998
 GameObject:
   m_ObjectHideFlags: 0
@@ -9707,6 +9729,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1711206442562728701, guid: d999576148a55f84b9eeae8b7cd2eacf, type: 3}
+      propertyPath: map
+      value: 
+      objectReference: {fileID: 913797266}
     - target: {fileID: 4321458189108462680, guid: d999576148a55f84b9eeae8b7cd2eacf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.47
