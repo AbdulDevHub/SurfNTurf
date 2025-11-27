@@ -20,6 +20,22 @@ public class WaveManager : MonoBehaviour
     public float timeBeforeFirstWave = 5f;
     public float spawnInterval = 0.5f;
 
+    [Header("Dams")]
+    public GameObject dam1;
+    public GameObject dam2;
+
+    [Header("Dam Meshes")]
+    public MeshRenderer dam1Mesh;
+    public MeshRenderer dam2Mesh;
+
+    [Header("Dam Explosion Effects")]
+    public ParticleSystem dam1Explosion;
+    public ParticleSystem dam2Explosion;
+
+    [Header("Camera Shake Settings")]
+    public float shakeDuration = 0.3f;
+    public float shakeMagnitude = 0.3f;
+
     private float countdown = 0f;
     private bool waveInProgress = false;
 
@@ -56,20 +72,15 @@ public class WaveManager : MonoBehaviour
 
         UpdateWaveUI();
 
-        // ---------------------------
-        // BUILD LIST OF ALL ENEMIES
-        // ---------------------------
+        // Build master enemy list
         List<GameObject> enemyPool = new List<GameObject>();
-
         foreach (EnemyGroup group in wave.enemies)
         {
             for (int i = 0; i < group.count; i++)
                 enemyPool.Add(group.enemyPrefab);
         }
 
-        // ---------------------------
-        // SHUFFLE THE ENEMY LIST
-        // ---------------------------
+        // Shuffle list
         for (int i = 0; i < enemyPool.Count; i++)
         {
             GameObject temp = enemyPool[i];
@@ -78,9 +89,7 @@ public class WaveManager : MonoBehaviour
             enemyPool[rand] = temp;
         }
 
-        // ---------------------------
-        // SPAWN SHUFFLED ENEMIES
-        // ---------------------------
+        // Spawn enemies
         foreach (GameObject prefab in enemyPool)
         {
             EnemyPath path = wave.availablePaths[Random.Range(0, wave.availablePaths.Length)];
@@ -93,19 +102,19 @@ public class WaveManager : MonoBehaviour
             yield return new WaitForSeconds(spawnInterval);
         }
 
-        // Wait for all enemies to die
+        // Wait until all enemies die
         while (EnemyManager.aliveEnemies > 0)
             yield return null;
 
-        // Handle wave completion UI message
-        StartCoroutine(HandleWaveCompletion(wave));
+        // Handle wave completion
+        yield return StartCoroutine(HandleWaveCompletion(waveIndex));
 
         waveIndex++;
         waveInProgress = false;
 
         if (waveIndex < waves.Length)
         {
-            countdown = wave.delayAfterWave;
+            countdown = waves[waveIndex - 1].delayAfterWave;
             UpdateCountdownUI();
         }
         else
@@ -114,8 +123,29 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    private IEnumerator HandleWaveCompletion(Wave wave)
+    private IEnumerator HandleWaveCompletion(int completedWaveIndex)
     {
+        // ----------------------------------
+        // WAVE 1 → BREAK DAM 1
+        // ----------------------------------
+        if (completedWaveIndex == 0 && dam1 != null)
+        {
+            yield return StartCoroutine(BreakDam(dam1, dam1Mesh, dam1Explosion));
+        }
+
+        // ----------------------------------
+        // WAVE 2 → BREAK DAM 2
+        // ----------------------------------
+        else if (completedWaveIndex == 1 && dam2 != null)
+        {
+            yield return StartCoroutine(BreakDam(dam2, dam2Mesh, dam2Explosion));
+        }
+
+        // ----------------------------------
+        // WAVE MESSAGE
+        // ----------------------------------
+        Wave wave = waves[completedWaveIndex];
+
         if (!string.IsNullOrWhiteSpace(wave.waveMessage) && waveMessagePanel != null)
         {
             waveMessagePanel.SetActive(true);
@@ -129,6 +159,35 @@ public class WaveManager : MonoBehaviour
 
             waveMessagePanel.SetActive(false);
         }
+    }
+
+    private IEnumerator BreakDam(GameObject dam, MeshRenderer damMesh, ParticleSystem explosion)
+    {
+        Vector3 damPos = dam.transform.position;
+
+        // Camera moves to dam and STAYS there
+        if (CameraShake.Instance != null)
+            yield return StartCoroutine(CameraShake.Instance.FocusOnPoint(damPos, 12f, 0.7f));
+
+        // Hide dam mesh
+        if (damMesh != null)
+            damMesh.enabled = false;
+
+        // Play explosion
+        if (explosion != null)
+            explosion.Play();
+
+        // Shake camera without snapping to old position
+        if (CameraShake.Instance != null)
+            StartCoroutine(CameraShake.Instance.Shake(shakeDuration, shakeMagnitude));
+
+        // Wait for explosion to finish
+        if (explosion != null)
+            yield return new WaitForSeconds(explosion.main.duration);
+
+        // Stop explosion
+        if (explosion != null)
+            explosion.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     private void UpdateWaveUI()
