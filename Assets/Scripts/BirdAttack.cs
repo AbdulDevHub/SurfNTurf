@@ -162,6 +162,9 @@ public class BirdAttack : MonoBehaviour
     {
         if (currentTarget == null) yield break;
 
+        // 🔊 Play Bird Attack sound
+        SoundManager.Instance.PlaySound("Bird Attack", transform.position);
+
         // Phase 1: Look at and move toward enemy
         Vector3 targetPosition = currentTarget.transform.position;
         Vector3 directionToEnemy = (targetPosition - transform.position).normalized;

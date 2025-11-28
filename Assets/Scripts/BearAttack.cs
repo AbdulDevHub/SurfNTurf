@@ -126,6 +126,9 @@ public class BearAttack : MonoBehaviour
                 string attackAnim = attacks[Random.Range(0, attacks.Length)];
                 animator?.Play(attackAnim);
 
+                // 🔊 Play the Bear Attack sound here
+                SoundManager.Instance.PlaySound("Bear Attack", transform.position);
+
                 // Wait for attack animation to play
                 yield return new WaitForSeconds(attackAnimationDuration);
 

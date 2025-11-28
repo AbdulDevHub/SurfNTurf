@@ -178,6 +178,9 @@ public class WaveManager : MonoBehaviour
         if (explosion != null)
             explosion.Play();
 
+        // 🔊 PLAY SOUND HERE
+        SoundManager.Instance.PlaySound("Dam Explosion", damPos);
+
         // Shake camera without snapping to old position
         if (CameraShake.Instance != null)
             StartCoroutine(CameraShake.Instance.Shake(shakeDuration, shakeMagnitude));

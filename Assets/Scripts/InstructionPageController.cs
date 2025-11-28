@@ -27,18 +27,34 @@ public class InstructionPageController : MonoBehaviour
         if (canvasGroup != null)
             canvasGroup.alpha = 0f;
 
-        // Listeners
+        // Listeners + sound
         if (gearButton != null)
-            gearButton.onClick.AddListener(ShowInstructionPage);
+            gearButton.onClick.AddListener(() =>
+            {
+                SoundManager.Instance.PlaySound("Button Click");
+                ShowInstructionPage();
+            });
 
         if (backButton != null)
-            backButton.onClick.AddListener(HideInstructionPage);
+            backButton.onClick.AddListener(() =>
+            {
+                SoundManager.Instance.PlaySound("Button Click");
+                HideInstructionPage();
+            });
 
         if (quitButton != null)
-            quitButton.onClick.AddListener(QuitGame);
+            quitButton.onClick.AddListener(() =>
+            {
+                SoundManager.Instance.PlaySound("Button Click");
+                QuitGame();
+            });
 
         if (mainMenuButton != null)
-            mainMenuButton.onClick.AddListener(LoadMainMenu);
+            mainMenuButton.onClick.AddListener(() =>
+            {
+                SoundManager.Instance.PlaySound("Button Click");
+                LoadMainMenu();
+            });
     }
 
 

@@ -246,6 +246,9 @@ public class FishermanAttack : MonoBehaviour
     {
         isSwingingRod = true;
 
+        // PLAY FISHING ROD SOUND (LEVEL 1)
+        SoundManager.Instance.PlaySound("Fishing Rod", transform.position);
+
         // Phase 1: Swing down
         float elapsedTime = 0f;
         float swingDuration = 0.15f / rodSwingSpeed;
@@ -340,10 +343,14 @@ public class FishermanAttack : MonoBehaviour
             );
 
             // Different net scale for LV2 and LV3
-            if (fishermanLevel == 2)
+            if (fishermanLevel == 2) {                
+                SoundManager.Instance.PlaySound("Fish Net LV1", transform.position);
                 activeNet.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-            else if (fishermanLevel == 3)
+            }
+            else if (fishermanLevel == 3) {
+                SoundManager.Instance.PlaySound("Fish Net LV2", transform.position);
                 activeNet.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
         }
 
         // Trap the selected enemies

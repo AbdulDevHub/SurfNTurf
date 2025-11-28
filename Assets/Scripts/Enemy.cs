@@ -74,6 +74,9 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        // Play the death sound
+        SoundManager.Instance.PlaySound("Fish Killed");
+
         EnemyManager.aliveEnemies--;
         Destroy(gameObject);
     }
