@@ -58,7 +58,7 @@ public class MainMenuScript : MonoBehaviour
         if (musicSource != null)
             musicSource.Stop();
 
-        SceneManager.LoadScene("MainGameMap");
+        SceneManager.LoadScene("Game");
     }
 
     public void QuitGame()

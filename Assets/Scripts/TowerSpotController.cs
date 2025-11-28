@@ -31,7 +31,7 @@ public class TowerSpotController : MonoBehaviour
     {
         { "Bird",      new Dictionary<int,int>() { {1,3}, {2,4}, {3,5} } },
         { "Bear",      new Dictionary<int,int>() { {1,1}, {2,2} } },
-        { "Fisherman", new Dictionary<int,int>() { {1,1} } }
+        { "Fisherman", new Dictionary<int,int>() { {1,1}, {2,2}, {3,3} } }
     };
 
     void Awake()

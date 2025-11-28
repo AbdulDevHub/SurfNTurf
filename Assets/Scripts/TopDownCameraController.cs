@@ -9,6 +9,7 @@ public class TopDownCameraController : MonoBehaviour
     public float zoomSpeed = 10f;
     public float minHeight = 5f;
     public float maxHeight = 40f;
+    public float defaultHeight = 20f;
     public float keyZoomMultiplier = 0.3f;
 
     [Header("Map Bounds")]
@@ -20,6 +21,11 @@ public class TopDownCameraController : MonoBehaviour
     private void Start()
     {
         cam = GetComponent<Camera>();
+
+        // Set camera to default height (clamped just in case)
+        Vector3 pos = transform.position;
+        pos.y = Mathf.Clamp(defaultHeight, minHeight, maxHeight);
+        transform.position = pos;
 
         Collider col = map.GetComponent<Collider>();
         if (col != null)

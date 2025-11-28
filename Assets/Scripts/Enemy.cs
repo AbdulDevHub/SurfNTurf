@@ -70,6 +70,10 @@ public class Enemy : MonoBehaviour
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
 
+        // ADD THIS:
+        if (StatManager.Instance != null)
+            StatManager.Instance.AddScore(amount);
+
         if (currentHealth <= 0)
             Die();
     }

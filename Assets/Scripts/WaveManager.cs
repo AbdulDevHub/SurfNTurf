@@ -120,6 +120,7 @@ public class WaveManager : MonoBehaviour
         else
         {
             countdownText.text = "All waves completed!";
+            StartCoroutine(HandleAllWavesCompleted());
         }
     }
 
@@ -205,5 +206,11 @@ public class WaveManager : MonoBehaviour
             else
                 countdownText.text = "";
         }
+    }
+
+    private IEnumerator HandleAllWavesCompleted()
+    {
+        yield return new WaitForSeconds(2f);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("EndScene");
     }
 }

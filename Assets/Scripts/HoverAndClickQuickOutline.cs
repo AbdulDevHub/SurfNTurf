@@ -2,16 +2,15 @@ using UnityEngine;
 
 public class HoverAndClickQuickOutline : MonoBehaviour
 {
-    [Header("Cursor Textures")]
-    public Texture2D hoverCursor;
-    public Texture2D defaultCursor;
     public Vector2 hotspot = Vector2.zero;
 
     private Outline lastHovered;
+    private CursorManager cursorManager;
 
     void Start()
     {
-        // Disable all Outline components in the scene initially
+        cursorManager = FindObjectOfType<CursorManager>();
+
         Outline[] outlines = Object.FindObjectsByType<Outline>(FindObjectsSortMode.None);
         foreach (var o in outlines)
         {
@@ -21,6 +20,10 @@ public class HoverAndClickQuickOutline : MonoBehaviour
 
     void Update()
     {
+        // Don't override if pointer is over a UI element
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hit))
@@ -33,22 +36,22 @@ public class HoverAndClickQuickOutline : MonoBehaviour
                 {
                     ResetLastHovered();
                     lastHovered = outline;
-                    lastHovered.enabled = true; // enable outline on hover
+                    lastHovered.enabled = true;
                 }
 
-                Cursor.SetCursor(hoverCursor, hotspot, CursorMode.Auto);
+                cursorManager.SetPointerCursor();
 
                 if (Input.GetMouseButtonDown(0))
                 {
                     Debug.Log("Clicked: " + hit.collider.gameObject.name);
                 }
 
-                return; // exit to prevent resetting cursor/outline
+                return; // exit to prevent resetting
             }
         }
 
         ResetLastHovered();
-        Cursor.SetCursor(defaultCursor, hotspot, CursorMode.Auto);
+        cursorManager.SetDefaultCursor();
     }
 
     private void ResetLastHovered()

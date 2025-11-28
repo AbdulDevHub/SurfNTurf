@@ -6,9 +6,19 @@ using UnityEngine.SceneManagement;
 public class EndScreenScript : MonoBehaviour
 {
     [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI scoreText;    // Text field to display score
-    [SerializeField] private Button quitButton;            // Quit game button
-    [SerializeField] private Button mainMenuButton;        // Return to main menu button
+    [SerializeField] private TextMeshProUGUI totalTime;       // Text field to display total time
+    [SerializeField] private TextMeshProUGUI remainingScales; // Text field to display remaining scales
+    [SerializeField] private TextMeshProUGUI remainingHealth; // Text field to display remaining health
+    [SerializeField] private TextMeshProUGUI scoreText;       // Text field to display score
+    [SerializeField] private Button quitButton;               // Quit game button
+    [SerializeField] private Button mainMenuButton;           // Return to main menu button
+    [SerializeField] private Button playAgainButton;
+
+    [Header("Outcome UI")]
+    [SerializeField] private TextMeshProUGUI outcomeText;
+    [SerializeField] private Image outcomeImage;
+    [SerializeField] private Sprite bearHappy;
+    [SerializeField] private Sprite bearSad;
 
     [Header("Button Sounds")]
     [SerializeField] private AudioClip clickSound;
@@ -18,33 +28,35 @@ public class EndScreenScript : MonoBehaviour
     // Call this method to display the final score
     public void ShowScore(float totalTime, int remainingScales, int remainingHealth, int totalScore)
     {
+        if (this.totalTime != null) {
+            int minutes = Mathf.FloorToInt(totalTime / 60f);
+            int seconds = Mathf.FloorToInt(totalTime % 60f);
+            this.totalTime.text = $"Total Time: {minutes:00}:{seconds:00}";
+        }
+        if (this.remainingScales != null)
+            this.remainingScales.text = $"Remaining Scales: {remainingScales}";
+        if (this.remainingHealth != null)
+            this.remainingHealth.text = $"Remaining Health: {remainingHealth}";
         if (scoreText != null)
-            scoreText.text = 
-                $"Total Time: {totalTime:F2} s\n" +
-                $"Remaining Scales: {remainingScales}\n" +
-                $"Remaining Health: {remainingHealth}\n" +
-                $"Total Score: {totalScore}";
+            scoreText.text = $"Total Score: {totalScore}";
     }
 
     private void Start()
     {
-        // Add button listeners
-        if (quitButton != null)
-            quitButton.onClick.AddListener(QuitGame);
+        // Buttons
+        if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+        if (mainMenuButton != null) mainMenuButton.onClick.AddListener(ReturnToMainMenu);
+        if (playAgainButton != null) playAgainButton.onClick.AddListener(PlayAgain);
 
-        if (mainMenuButton != null)
-            mainMenuButton.onClick.AddListener(ReturnToMainMenu);
-
-        // Add audio source for button clicks
         audioSource = gameObject.AddComponent<AudioSource>();
+
+        UpdateOutcome();
     }
 
     private void PlayClickSound()
     {
         if (clickSound != null && audioSource != null)
-        {
             audioSource.PlayOneShot(clickSound);
-        }
     }
 
     private void QuitGame()
@@ -57,6 +69,37 @@ public class EndScreenScript : MonoBehaviour
     private void ReturnToMainMenu()
     {
         PlayClickSound();
-        SceneManager.LoadScene("MainMenu"); // Make sure your main menu scene is named "MainMenu"
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    private void PlayAgain()
+    {
+        PlayClickSound();
+        SceneManager.LoadScene("Game");
+    }
+
+    private void UpdateOutcome()
+    {
+        if (StatManager.Instance == null)
+            return;
+
+        bool playerWon = StatManager.Instance.remainingHealth > 0;
+
+        if (outcomeText != null)
+        {
+            if (playerWon)
+            {
+                outcomeText.text = "You Won!";
+                outcomeText.color = new Color32(0, 200, 0, 255); // Victory green
+            }
+            else
+            {
+                outcomeText.text = "You Failed!";
+                outcomeText.color = new Color32(255, 0, 53, 255); // FF0035
+            }
+        }
+
+        if (outcomeImage != null)
+            outcomeImage.sprite = playerWon ? bearHappy : bearSad;
     }
 }

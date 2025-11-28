@@ -26,6 +26,11 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
+
+        // Sync to StatManager
+        if (StatManager.Instance != null)
+            StatManager.Instance.remainingHealth = currentHealth;
+
         StartCoroutine(AnimateHealthBar());
     }
 

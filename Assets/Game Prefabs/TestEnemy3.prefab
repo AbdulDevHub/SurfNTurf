@@ -619,7 +619,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   pathToFollow: {fileID: 0}
   maxHealth: 7
-  speed: 5
+  speed: 3
   enemyName: TestEnemy3
   currentHealth: 0
 --- !u!195 &8173599506342464828

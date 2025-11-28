@@ -3,8 +3,9 @@ using System;
 
 public class BearRangeTrigger : MonoBehaviour
 {
-    public static event Action<Enemy> OnEnemyEnter;
-    public static event Action<Enemy> OnEnemyExit;
+    // Changed to non-static instance events
+    public event Action<Enemy> OnEnemyEnter;
+    public event Action<Enemy> OnEnemyExit;
 
     private void OnTriggerEnter(Collider other)
     {
