@@ -247,8 +247,7 @@ public class TowerSpotController : MonoBehaviour
         // Deduct scales
         StatManager.Instance.AddScales(-buildCost);
 
-        GameUIManager.Instance.HideTowerTypeUI();
-        GameUIManager.Instance.ShowTowerInfoUI();
+        // Stay in tower info UI, but update to show the built tower
         UpdateTowerInfoUI();
     }
 
@@ -383,12 +382,34 @@ public class TowerSpotController : MonoBehaviour
         }
     }
 
-    // Add this to TowerSpotController.cs
+    // ============================================================
+    // Public Accessors (for GameUIManager)
+    // ============================================================
+    
     public int GetBuildCost(string type)
     {
         if (initialBuildCosts.ContainsKey(type))
             return initialBuildCosts[type];
         return 0;
+    }
+
+    public int GetCurrentLevel()
+    {
+        return currentLevel;
+    }
+
+    public int GetTowerRange(string type, int level)
+    {
+        if (towerRangeLookup.ContainsKey(type) && towerRangeLookup[type].ContainsKey(level))
+            return towerRangeLookup[type][level];
+        return 0;
+    }
+
+    public TowerStats GetTowerStatsForLevel(string type, int level)
+    {
+        if (towerStatsLookup.ContainsKey(type) && towerStatsLookup[type].ContainsKey(level))
+            return towerStatsLookup[type][level];
+        return new TowerStats(0, 0, 0, 0f);
     }
 
     // ============================================================

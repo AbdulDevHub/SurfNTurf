@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -28,6 +29,7 @@ public class GameUIManager : MonoBehaviour
     public TMP_Text damageText;
     public TMP_Text rangeText;
     public TMP_Text rateText;
+    public TMP_Text upgradeButtonText;
     public TMP_Text upgradeCostText;
     public TMP_Text sellCostText;
 
@@ -35,16 +37,10 @@ public class GameUIManager : MonoBehaviour
     public float shakeDuration = 0.5f;
     public float shakeAmount = 10f;
 
-    // Store original colors
-    private Color birdButtonOriginalColor;
-    private Color bearButtonOriginalColor;
-    private Color fishermanButtonOriginalColor;
-    private bool colorsStored = false;
-
-    // Track which buttons are currently shaking
-    private Coroutine birdShakeCoroutine;
-    private Coroutine bearShakeCoroutine;
-    private Coroutine fishermanShakeCoroutine;
+    // Track selected tower type for placement
+    private string selectedTowerTypeForPlacement = "";
+    private Coroutine upgradeButtonShakeCoroutine;
+    private Coroutine sellButtonShakeCoroutine;
 
     void Awake()
     {
@@ -65,57 +61,111 @@ public class GameUIManager : MonoBehaviour
 
     void SetupButtonListeners()
     {
-        // Tower Type UI buttons
+        // Tower Type UI buttons - now just select tower type
         if (birdButton != null)
-            birdButton.onClick.AddListener(() => BuildTowerType("Bird", birdButton));
+            birdButton.onClick.AddListener(() => SelectTowerType("Bird"));
 
         if (bearButton != null)
-            bearButton.onClick.AddListener(() => BuildTowerType("Bear", bearButton));
+            bearButton.onClick.AddListener(() => SelectTowerType("Bear"));
 
         if (fishermanButton != null)
-            fishermanButton.onClick.AddListener(() => BuildTowerType("Fisherman", fishermanButton));
+            fishermanButton.onClick.AddListener(() => SelectTowerType("Fisherman"));
 
         if (exitTowerTypeButton != null)
             exitTowerTypeButton.onClick.AddListener(ExitAllUI);
 
-        // Tower Info UI buttons
+        // Tower Info UI buttons - only add onClick for when they're enabled
         if (upgradeButton != null)
-            upgradeButton.onClick.AddListener(UpgradeTower);
+            upgradeButton.onClick.AddListener(HandleUpgradeOrPlaceButton);
 
         if (sellButton != null)
             sellButton.onClick.AddListener(SellTower);
 
         if (exitTowerInfoButton != null)
             exitTowerInfoButton.onClick.AddListener(ExitAllUI);
+
+        // Add EventTriggers for disabled button detection
+        AddDisabledButtonDetection(upgradeButton, OnUpgradeButtonClicked);
+        AddDisabledButtonDetection(sellButton, OnSellButtonClicked);
     }
 
-    // ===== Tower Type Panel Methods =====
-
-    void BuildTowerType(string type, Button button)
+    // NEW: Add EventTrigger to detect clicks even when button is disabled
+    void AddDisabledButtonDetection(Button button, System.Action callback)
     {
-        if (TowerSpotController.ActiveSpot != null)
+        if (button == null) return;
+
+        EventTrigger trigger = button.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        entry.callback.AddListener((data) => { callback?.Invoke(); });
+        trigger.triggers.Add(entry);
+    }
+
+    // NEW: Handle upgrade button clicks (works even when disabled)
+    void OnUpgradeButtonClicked()
+    {
+        // If button is disabled, shake it
+        if (upgradeButton != null && !upgradeButton.interactable)
         {
-            // Check if player can afford this tower
-            int buildCost = TowerSpotController.ActiveSpot.GetBuildCost(type);
+            if (upgradeButtonShakeCoroutine == null)
+            {
+                upgradeButtonShakeCoroutine = StartCoroutine(ShakeButton(upgradeButton, () => upgradeButtonShakeCoroutine = null));
+            }
+        }
+        // If enabled, the onClick listener will handle it
+    }
+
+    // NEW: Handle sell button clicks (works even when disabled)
+    void OnSellButtonClicked()
+    {
+        // If button is disabled, shake it
+        if (sellButton != null && !sellButton.interactable)
+        {
+            if (sellButtonShakeCoroutine == null)
+            {
+                sellButtonShakeCoroutine = StartCoroutine(ShakeButton(sellButton, () => sellButtonShakeCoroutine = null));
+            }
+        }
+        // If enabled, the onClick listener will handle it
+    }
+
+    void SelectTowerType(string type)
+    {
+        if (TowerSpotController.ActiveSpot != null && TowerSpotController.ActiveSpot.GetCurrentLevel() == 0)
+        {
+            selectedTowerTypeForPlacement = type;
+            
+            // Switch to tower info UI showing placement info
+            HideTowerTypeUI();
+            ShowTowerInfoUI();
+            UpdatePlacementInfoUI(type);
+        }
+    }
+
+    void HandleUpgradeOrPlaceButton()
+    {
+        if (TowerSpotController.ActiveSpot == null) return;
+
+        // If we're in placement mode
+        if (TowerSpotController.ActiveSpot.GetCurrentLevel() == 0 && !string.IsNullOrEmpty(selectedTowerTypeForPlacement))
+        {
+            int buildCost = TowerSpotController.ActiveSpot.GetBuildCost(selectedTowerTypeForPlacement);
             if (StatManager.Instance.remainingScales < buildCost)
             {
-                // Determine which coroutine to use based on button type
-                if (button == birdButton && birdShakeCoroutine == null)
-                {
-                    birdShakeCoroutine = StartCoroutine(ShakeButton(button, () => birdShakeCoroutine = null));
-                }
-                else if (button == bearButton && bearShakeCoroutine == null)
-                {
-                    bearShakeCoroutine = StartCoroutine(ShakeButton(button, () => bearShakeCoroutine = null));
-                }
-                else if (button == fishermanButton && fishermanShakeCoroutine == null)
-                {
-                    fishermanShakeCoroutine = StartCoroutine(ShakeButton(button, () => fishermanShakeCoroutine = null));
-                }
-                return;
+                return; // EventTrigger will handle the shake
             }
 
-            TowerSpotController.ActiveSpot.BuildTowerFromUI(type);
+            // Place the tower
+            TowerSpotController.ActiveSpot.BuildTowerFromUI(selectedTowerTypeForPlacement);
+            selectedTowerTypeForPlacement = "";
+        }
+        // If we're in upgrade mode
+        else
+        {
+            UpgradeTower();
         }
     }
 
@@ -153,8 +203,6 @@ public class GameUIManager : MonoBehaviour
         onComplete?.Invoke();
     }
 
-    // ===== Tower Info Panel Methods =====
-
     void UpgradeTower()
     {
         if (TowerSpotController.ActiveSpot != null)
@@ -163,27 +211,18 @@ public class GameUIManager : MonoBehaviour
 
     void SellTower()
     {
-        if (TowerSpotController.ActiveSpot != null)
-            TowerSpotController.ActiveSpot.DeleteTowerFromUI();
+        if (TowerSpotController.ActiveSpot == null) return;
+        
+        TowerSpotController.ActiveSpot.DeleteTowerFromUI();
     }
-
-    // ===== UI Visibility Methods =====
 
     public void ShowTowerTypeUI()
     {
         if (towerTypeUI != null)
         {
             towerTypeUI.SetActive(true);
-            
-            // Store original colors on first show
-            if (!colorsStored)
-            {
-                StoreOriginalColors();
-                colorsStored = true;
-            }
-            
-            UpdateTowerButtonStates();
         }
+        selectedTowerTypeForPlacement = "";
     }
 
     public void HideTowerTypeUI()
@@ -202,105 +241,76 @@ public class GameUIManager : MonoBehaviour
     {
         if (towerInfoUI != null)
             towerInfoUI.SetActive(false);
+        selectedTowerTypeForPlacement = "";
     }
 
     public void ExitAllUI()
     {
         if (TowerSpotController.ActiveSpot != null)
             TowerSpotController.ActiveSpot.ExitUIFromUI();
+        selectedTowerTypeForPlacement = "";
     }
 
-    // ===== Update Tower Button States =====
-    void StoreOriginalColors()
-    {
-        if (birdButton != null)
-        {
-            Image img = birdButton.GetComponent<Image>();
-            if (img != null) birdButtonOriginalColor = img.color;
-        }
-
-        if (bearButton != null)
-        {
-            Image img = bearButton.GetComponent<Image>();
-            if (img != null) bearButtonOriginalColor = img.color;
-        }
-
-        if (fishermanButton != null)
-        {
-            Image img = fishermanButton.GetComponent<Image>();
-            if (img != null) fishermanButtonOriginalColor = img.color;
-        }
-    }
-
-    public void UpdateTowerButtonStates()
+    void UpdatePlacementInfoUI(string type)
     {
         if (TowerSpotController.ActiveSpot == null) return;
 
-        int currentScales = StatManager.Instance.remainingScales;
+        int buildCost = TowerSpotController.ActiveSpot.GetBuildCost(type);
+        int range = TowerSpotController.ActiveSpot.GetTowerRange(type, 1);
 
-        // Update Bird button
-        if (birdButton != null)
+        // Update header
+        if (typeAndLevelText != null)
         {
-            int birdCost = TowerSpotController.ActiveSpot.GetBuildCost("Bird");
-            UpdateButtonVisuals(birdButton, currentScales >= birdCost, birdButtonOriginalColor);
+            string displayType = type == "Fisherman" ? "Fishman" : type;
+            typeAndLevelText.text = $"{displayType} Tower";
         }
 
-        // Update Bear button
-        if (bearButton != null)
+        // Get level 1 stats
+        var stats = TowerSpotController.ActiveSpot.GetTowerStatsForLevel(type, 1);
+
+        // Update stats display
+        if (type == "Fisherman")
         {
-            int bearCost = TowerSpotController.ActiveSpot.GetBuildCost("Bear");
-            UpdateButtonVisuals(bearButton, currentScales >= bearCost, bearButtonOriginalColor);
+            if (damageText != null)
+                damageText.text = $"Damage: {stats.damage}";
+            if (rangeText != null)
+                rangeText.text = $"Range: {range}";
+            if (rateText != null)
+                rateText.text = $"Rate: {stats.rate:F1}s";
+        }
+        else
+        {
+            if (damageText != null)
+                damageText.text = $"Damage: {stats.damage}";
+            if (rangeText != null)
+                rangeText.text = $"Range: {range}";
+            if (rateText != null)
+                rateText.text = $"Rate: {stats.rate:F1}s";
         }
 
-        // Update Fisherman button
-        if (fishermanButton != null)
+        // Update button text to "Place"
+        if (upgradeButtonText != null)
+            upgradeButtonText.text = "Place";
+
+        if (upgradeCostText != null)
+            upgradeCostText.text = $"{buildCost} Scales";
+
+        // Show N/A for sell cost during placement
+        if (sellCostText != null)
+            sellCostText.text = "N/A";
+
+        // Update button interactability based on affordability
+        if (upgradeButton != null)
         {
-            int fishermanCost = TowerSpotController.ActiveSpot.GetBuildCost("Fisherman");
-            UpdateButtonVisuals(fishermanButton, currentScales >= fishermanCost, fishermanButtonOriginalColor);
+            bool canAfford = StatManager.Instance.remainingScales >= buildCost;
+            upgradeButton.interactable = canAfford;
         }
+
+        // Grey out sell button during placement (can't sell what hasn't been built)
+        if (sellButton != null)
+            sellButton.interactable = false;
     }
 
-    void UpdateButtonVisuals(Button button, bool canAfford, Color originalColor)
-    {
-        if (button == null) return;
-
-        // Change to grey color when can't afford, restore original color when can afford
-        Image buttonImage = button.GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            if (canAfford)
-            {
-                // Restore original color
-                buttonImage.color = originalColor;
-            }
-            else
-            {
-                // Apply lighter grey tint for better text visibility
-                buttonImage.color = new Color(0.7f, 0.7f, 0.7f, 1f);
-            }
-        }
-
-        // Also grey out any child images (icons, etc.)
-        Image[] childImages = button.GetComponentsInChildren<Image>();
-        foreach (Image img in childImages)
-        {
-            if (img != buttonImage) // Skip the button itself
-            {
-                if (canAfford)
-                {
-                    img.color = Color.white;
-                }
-                else
-                {
-                    img.color = new Color(0.7f, 0.7f, 0.7f, 1f);
-                }
-            }
-        }
-
-        // Text stays black - no color changes needed for text
-    }
-
-    // ===== Update Tower Info Display =====
     public void UpdateTowerInfo(
     string type,
     int level,
@@ -312,6 +322,14 @@ public class GameUIManager : MonoBehaviour
     bool canUpgrade,
     int maxLevel)
     {
+        // Reset button text to "Upgrade"
+        if (upgradeButtonText != null)
+            upgradeButtonText.text = "Upgrade";
+
+        // Enable sell button for existing towers
+        if (sellButton != null)
+            sellButton.interactable = true;
+
         // Header text
         if (typeAndLevelText != null)
         {

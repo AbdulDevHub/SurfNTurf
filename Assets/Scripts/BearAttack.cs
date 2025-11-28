@@ -24,7 +24,6 @@ public class BearAttack : MonoBehaviour
 
     private void Awake()
     {
-        // Set stats based on bear level
         SetStatsForLevel();
 
         if (rangeTrigger == null)
@@ -33,10 +32,8 @@ public class BearAttack : MonoBehaviour
             return;
         }
 
-        // Ensure trigger collider is set
         rangeTrigger.isTrigger = true;
 
-        // Get the BearRangeTrigger component from the assigned collider
         rangeTriggerScript = rangeTrigger.GetComponent<BearRangeTrigger>();
         if (rangeTriggerScript == null)
         {
@@ -56,7 +53,7 @@ public class BearAttack : MonoBehaviour
                 damage = 5;
                 attackInterval = 2f;
                 break;
-            case 3: // If you add a level 3 later
+            case 3:
                 damage = 8;
                 attackInterval = 1.5f;
                 break;
@@ -70,30 +67,24 @@ public class BearAttack : MonoBehaviour
 
     private void OnEnable()
     {
-        // Subscribe to THIS specific range trigger's events
         if (rangeTriggerScript != null)
         {
             rangeTriggerScript.OnEnemyEnter += HandleEnemyEnter;
             rangeTriggerScript.OnEnemyExit += HandleEnemyExit;
         }
 
-        // Start the attack routine when enabled
         if (attackCoroutine == null)
-        {
             attackCoroutine = StartCoroutine(AttackRoutine());
-        }
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from THIS specific range trigger's events
         if (rangeTriggerScript != null)
         {
             rangeTriggerScript.OnEnemyEnter -= HandleEnemyEnter;
             rangeTriggerScript.OnEnemyExit -= HandleEnemyExit;
         }
 
-        // Stop the attack routine when disabled
         if (attackCoroutine != null)
         {
             StopCoroutine(attackCoroutine);
@@ -115,6 +106,15 @@ public class BearAttack : MonoBehaviour
             currentTarget = null;
     }
 
+    private void Update()
+    {
+        // Rotate every frame toward the enemy
+        if (currentTarget != null)
+        {
+            LookAtTarget();
+        }
+    }
+
     private IEnumerator AttackRoutine()
     {
         while (true)
@@ -126,27 +126,19 @@ public class BearAttack : MonoBehaviour
                 string attackAnim = attacks[Random.Range(0, attacks.Length)];
                 animator?.Play(attackAnim);
 
-                // 🔊 Play the Bear Attack sound here
                 SoundManager.Instance.PlaySound("Bear Attack", transform.position);
 
-                // Wait for attack animation to play
                 yield return new WaitForSeconds(attackAnimationDuration);
 
-                // Deal damage after animation plays
                 if (currentTarget != null)
                     currentTarget.TakeDamage(damage);
 
-                // Sit animation during cooldown
                 animator?.Play("Sit");
 
-                // Wait for remaining cooldown time
                 float remainingCooldown = attackInterval - attackAnimationDuration;
                 if (remainingCooldown > 0)
-                {
                     yield return new WaitForSeconds(remainingCooldown);
-                }
 
-                // Reset if enemy is dead
                 if (currentTarget != null && currentTarget.CurrentHealth <= 0)
                     currentTarget = null;
             }
@@ -155,6 +147,24 @@ public class BearAttack : MonoBehaviour
                 animator?.Play("Idle");
                 yield return null;
             }
+        }
+    }
+
+    private void LookAtTarget()
+    {
+        if (currentTarget == null) return;
+
+        Vector3 direction = currentTarget.transform.position - transform.position;
+        direction.y = 0; // keep upright
+
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                Time.deltaTime * 8f
+            );
         }
     }
 }
