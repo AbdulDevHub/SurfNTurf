@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [HideInInspector] public EnemyPath pathToFollow;   // Assigned at spawn
+    [HideInInspector] public EnemyPath pathToFollow;
     private Transform[] waypoints;
     private int waypointIndex = 0;
     private NavMeshAgent agent;
@@ -11,11 +11,10 @@ public class Enemy : MonoBehaviour
     [Header("Stats")]
     [SerializeField] private int maxHealth = 10;
     [SerializeField] private float speed = 3.5f;
-    public string enemyName = "Enemy"; // Name to display in UI
+    public string enemyName = "Enemy";
 
     [HideInInspector] public int currentHealth;
 
-    // Public getters for UI access
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public float Speed => speed;
@@ -31,19 +30,13 @@ public class Enemy : MonoBehaviour
 
         agent = GetComponent<NavMeshAgent>();
         currentHealth = maxHealth;
-
-        // Set agent speed
         agent.speed = speed;
 
-        // Snap to NavMesh at spawn
         NavMeshHit hit;
         if (NavMesh.SamplePosition(pathToFollow.GetSpawnPoint(), out hit, 1f, NavMesh.AllAreas))
             agent.Warp(hit.position);
 
-        // Assign waypoints
         waypoints = pathToFollow.nodes;
-
-        // Set first destination
         if (waypoints.Length > 0)
             agent.destination = waypoints[waypointIndex].position;
 
@@ -57,7 +50,6 @@ public class Enemy : MonoBehaviour
         if (agent.remainingDistance <= agent.stoppingDistance)
         {
             waypointIndex++;
-
             if (waypointIndex < waypoints.Length)
                 agent.destination = waypoints[waypointIndex].position;
             else
@@ -67,12 +59,14 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        int previousHealth = currentHealth;
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
 
-        // ADD THIS:
-        if (StatManager.Instance != null)
-            StatManager.Instance.AddScore(amount);
+        // Add score/scales for the **actual damage dealt**
+        int damageDone = previousHealth - currentHealth;
+        if (StatManager.Instance != null && damageDone > 0)
+            StatManager.Instance.AddScore(damageDone);
 
         if (currentHealth <= 0)
             Die();

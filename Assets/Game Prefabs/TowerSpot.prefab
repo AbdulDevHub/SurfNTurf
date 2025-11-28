@@ -1439,16 +1439,28 @@ PrefabInstance:
     m_TransformParent: {fileID: 6973656007204858427}
     m_Modifications:
     - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.04216945
+      value: -0.076548
       objectReference: {fileID: 0}
     - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.469
+      value: 0.46483
       objectReference: {fileID: 0}
     - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.8221927
+      value: 4.7979
       objectReference: {fileID: 0}
     - target: {fileID: 253284298084048154, guid: db6e49a961a101a4fae060afa788aeaa, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1532,6 +1544,7 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
+  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &6267832578905361054
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1609,16 +1622,28 @@ PrefabInstance:
       value: Bird3
       objectReference: {fileID: 0}
     - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.113
+      value: -0.18686
       objectReference: {fileID: 0}
     - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.44716632
+      value: 0.43083
       objectReference: {fileID: 0}
     - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.788
+      value: 4.7447
       objectReference: {fileID: 0}
     - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1701,6 +1726,7 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
+  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &3415098855303242481
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1843,6 +1869,11 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!198 &3174197087695542956 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 797784518864179116, guid: a2a060732547fe64581bb0cb3c2bdf1d, type: 3}
+  m_PrefabInstance: {fileID: 2819059457635947776}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3615582694917915601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2133,16 +2164,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5573629
+      objectReference: {fileID: 0}
+    - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.077
+      value: -0.13079
       objectReference: {fileID: 0}
     - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.469
+      value: 0.46483
       objectReference: {fileID: 0}
     - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.801
+      value: 4.765
       objectReference: {fileID: 0}
     - target: {fileID: 802224358680020157, guid: da2e831cd086a3f48a59131034b8b1cf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2235,6 +2278,7 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
+  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &417845808831255569
 Rigidbody:
   m_ObjectHideFlags: 0

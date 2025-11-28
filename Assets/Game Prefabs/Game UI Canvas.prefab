@@ -656,6 +656,8 @@ MonoBehaviour:
   rateText: {fileID: 0}
   upgradeCostText: {fileID: 0}
   sellCostText: {fileID: 0}
+  shakeDuration: 0.5
+  shakeAmount: 10
 --- !u!114 &5095279252564933700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2230,7 +2232,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6760108416334348207
 RectTransform:
   m_ObjectHideFlags: 0

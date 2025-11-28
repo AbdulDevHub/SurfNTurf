@@ -34,6 +34,34 @@ public class TowerSpotController : MonoBehaviour
         { "Fisherman", new Dictionary<int,int>() { {1,1}, {2,2}, {3,3} } }
     };
 
+    // Tower Stats Lookup
+    private Dictionary<string, Dictionary<int, TowerStats>> towerStatsLookup =
+        new Dictionary<string, Dictionary<int, TowerStats>>()
+    {
+        { "Bird", new Dictionary<int, TowerStats>() {
+            {1, new TowerStats(500, 1, 3, 2f)},
+            {2, new TowerStats(600, 2, 4, 2f)},
+            {3, new TowerStats(700, 4, 5, 1f)}
+        }},
+        { "Bear", new Dictionary<int, TowerStats>() {
+            {1, new TowerStats(400, 3, 1, 3f)},
+            {2, new TowerStats(500, 5, 2, 2f)}
+        }},
+        { "Fisherman", new Dictionary<int, TowerStats>() {
+            {1, new TowerStats(250, 1, 1, 1f)},
+            {2, new TowerStats(300, 1, 2, 1f)},
+            {3, new TowerStats(350, 1, 3, 1f)}
+        }}
+    };
+
+    // Initial build costs (same as level 1 upgrade cost)
+    private Dictionary<string, int> initialBuildCosts = new Dictionary<string, int>()
+    {
+        { "Bird", 500 },
+        { "Bear", 400 },
+        { "Fisherman", 250 }
+    };
+
     void Awake()
     {
         circleRenderer = transform.Find("Circle")?.GetComponent<Renderer>();
@@ -60,9 +88,6 @@ public class TowerSpotController : MonoBehaviour
 
         if (crystalEffect != null)
             crystalEffect.SetActive(currentLevel == 0 && !isSelected);
-
-        if (magicCircleEffect != null)
-            magicCircleEffect.SetActive(shouldShowCircle);
     }
 
     // ============================================================
@@ -108,28 +133,100 @@ public class TowerSpotController : MonoBehaviour
     {
         if (currentLevel == 0) return;
 
-        // Calculate tower stats (customize these formulas as needed)
-        int damage = currentLevel * 10;
-        int range = towerRangeLookup[currentTowerType][currentLevel];
-        float rate = 1f / currentLevel;
-        int upgradeCost = currentLevel * 100;
-        int sellCost = currentLevel * 50;
+        string type = currentTowerType;
+        int level = currentLevel;
 
-        // Check if tower can be upgraded
-        bool canUpgrade = towerLevels.ContainsKey(currentTowerType) &&
-                         towerLevels[currentTowerType].Count > currentLevel &&
-                         towerLevels[currentTowerType][currentLevel] != null;
+        // ================================
+        // NON-FISHERMAN TOWERS (Bird/Bear)
+        // ================================
+        if (type != "Fisherman")
+        {
+            TowerStats stats = towerStatsLookup[type][level];
 
+            int damage = stats.damage;
+            int range = stats.range;
+            float rate = stats.rate;
+
+            bool canUpgrade = towerStatsLookup[type].ContainsKey(level + 1);
+            int upgradeCost = canUpgrade ? towerStatsLookup[type][level + 1].upgradeCost : 0;
+
+            int sellCost = CalculateSellCost();
+            int maxLevel = towerStatsLookup[type].Count;
+
+            GameUIManager.Instance.UpdateTowerInfo(
+                type,
+                level,
+                damage,
+                range,
+                rate,
+                upgradeCost,
+                sellCost,
+                canUpgrade,
+                maxLevel
+            );
+            return;
+        }
+
+        // ================================
+        // FISHERMAN SPECIAL CASE
+        // ================================
+
+        int displayDamage;   // = rod damage OR net capacity
+        float displayRate;   // = rod rate OR net cooldown
+
+        // LV1 → Rod mode (normal attack)
+        if (level == 1)
+        {
+            displayDamage = 1;    // baseDamage from FishermanAttack
+            displayRate   = 1f;   // baseAttackRate
+        }
+        // LV2 → Net trap (small net)
+        else if (level == 2)
+        {
+            displayDamage = 5;    // net capacity
+            displayRate   = 5f;   // cooldown
+        }
+        // LV3 → Net trap (large net)
+        else // level 3
+        {
+            displayDamage = 10;   // net capacity
+            displayRate   = 5f;   // cooldown
+        }
+
+        // Get range from your normal lookup
+        int displayRange = towerRangeLookup["Fisherman"][level];
+
+        // Upgrade logic
+        bool fisherCanUpgrade = towerStatsLookup["Fisherman"].ContainsKey(level + 1);
+        int fisherUpgradeCost = fisherCanUpgrade
+            ? towerStatsLookup["Fisherman"][level + 1].upgradeCost
+            : 0;
+
+        int fisherSell = CalculateSellCost();
+        int fisherMaxLevel = towerStatsLookup["Fisherman"].Count;
+
+        // Send to UI
         GameUIManager.Instance.UpdateTowerInfo(
-            currentTowerType,
-            currentLevel,
-            damage,
-            range,
-            rate,
-            upgradeCost,
-            sellCost,
-            canUpgrade
+            "Fisherman",
+            level,
+            displayDamage,
+            displayRange,
+            displayRate,
+            fisherUpgradeCost,
+            fisherSell,
+            fisherCanUpgrade,
+            fisherMaxLevel
         );
+    }
+
+    int CalculateSellCost()
+    {
+        int totalCost = 0;
+        for (int i = 1; i <= currentLevel; i++)
+        {
+            totalCost += towerStatsLookup[currentTowerType][i].upgradeCost;
+        }
+        return totalCost / 2;
     }
 
     // ============================================================
@@ -137,7 +234,18 @@ public class TowerSpotController : MonoBehaviour
     // ============================================================
     public void BuildTowerFromUI(string type)
     {
+        // Check if player has enough scales
+        int buildCost = initialBuildCosts[type];
+        if (StatManager.Instance.remainingScales < buildCost)
+        {
+            Debug.Log("Not enough scales to build " + type);
+            return;
+        }
+
         if (!BuildTower(type)) return;
+
+        // Deduct scales
+        StatManager.Instance.AddScales(-buildCost);
 
         GameUIManager.Instance.HideTowerTypeUI();
         GameUIManager.Instance.ShowTowerInfoUI();
@@ -146,13 +254,28 @@ public class TowerSpotController : MonoBehaviour
 
     public void UpgradeTowerFromUI()
     {
+        // Check if player has enough scales
+        int upgradeCost = towerStatsLookup[currentTowerType][currentLevel + 1].upgradeCost;
+        if (StatManager.Instance.remainingScales < upgradeCost)
+        {
+            Debug.Log("Not enough scales to upgrade");
+            return;
+        }
+
         if (!UpgradeTower()) return;
+        
+        // Deduct scales
+        StatManager.Instance.AddScales(-upgradeCost);
         
         UpdateTowerInfoUI();
     }
 
     public void DeleteTowerFromUI()
     {
+        // Refund scales
+        int sellCost = CalculateSellCost();
+        StatManager.Instance.AddScales(sellCost);
+
         DeleteTower();
         GameUIManager.Instance.HideTowerInfoUI();
         GameUIManager.Instance.ShowTowerTypeUI();
@@ -258,6 +381,14 @@ public class TowerSpotController : MonoBehaviour
                     model.SetActive(false);
             }
         }
+    }
+
+    // Add this to TowerSpotController.cs
+    public int GetBuildCost(string type)
+    {
+        if (initialBuildCosts.ContainsKey(type))
+            return initialBuildCosts[type];
+        return 0;
     }
 
     // ============================================================
@@ -375,5 +506,23 @@ public class TowerSpotController : MonoBehaviour
 
         HideAllRanges();
         UpdateCircleVisibility();
+    }
+}
+
+// Helper struct to store tower stats
+[System.Serializable]
+public struct TowerStats
+{
+    public int upgradeCost;
+    public int damage;
+    public int range;
+    public float rate;
+
+    public TowerStats(int upgradeCost, int damage, int range, float rate)
+    {
+        this.upgradeCost = upgradeCost;
+        this.damage = damage;
+        this.range = range;
+        this.rate = rate;
     }
 }

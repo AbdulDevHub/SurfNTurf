@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
 
 public class StatManager : MonoBehaviour
 {
@@ -9,17 +10,22 @@ public class StatManager : MonoBehaviour
     [Header("UI References")]
     public TMP_Text scalesText;
 
+    [Header("Default Stats")]
+    public int defaultScales = 10000;
+
     // Stats
     public float totalTime = 0f;
-    public int remainingScales = 1000;
-    public int remainingHealth = 0;
+    public int remainingScales;
+    public int remainingHealth;
     public int totalScore = 0;
 
     private PlayerHealth playerHealth;
 
+    // Animation settings
+    private Coroutine scaleAnimationCoroutine;
+
     private void Awake()
     {
-        // Singleton
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -28,23 +34,22 @@ public class StatManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        // Listen for scene loads
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        remainingScales = defaultScales;
     }
 
     private void Start()
     {
         playerHealth = FindAnyObjectByType<PlayerHealth>();
+        UpdateScalesUI();
     }
 
     private void Update()
     {
-        // Track time only during Game Scene
         if (SceneManager.GetActiveScene().name == "Game")
             totalTime += Time.deltaTime;
 
-        // Update health reference
         if (playerHealth == null)
             playerHealth = FindAnyObjectByType<PlayerHealth>();
 
@@ -52,18 +57,14 @@ public class StatManager : MonoBehaviour
             remainingHealth = playerHealth.currentHealth;
     }
 
-    // Called whenever a new scene loads
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Reset pointer to player health if we returned to game
         if (scene.name == "Game")
         {
             playerHealth = FindAnyObjectByType<PlayerHealth>();
             totalTime = 0f;
             totalScore = 0;
-            remainingScales = 1000;
-
-            // Refresh UI
+            remainingScales = defaultScales;
             UpdateScalesUI();
 
             if (playerHealth != null)
@@ -71,9 +72,7 @@ public class StatManager : MonoBehaviour
         }
         else if (scene.name == "EndScene")
         {
-            // Apply stats to End Scene UI
             EndScreenScript end = FindAnyObjectByType<EndScreenScript>();
-
             if (end != null)
             {
                 end.ShowScore(
@@ -86,11 +85,34 @@ public class StatManager : MonoBehaviour
         }
     }
 
-    // Call this whenever player spends/loses scales
+    // Smoothly animate scales increase
     public void AddScales(int amount)
     {
+        if (scaleAnimationCoroutine != null)
+            StopCoroutine(scaleAnimationCoroutine);
+
+        scaleAnimationCoroutine = StartCoroutine(AnimateScales(remainingScales, remainingScales + amount));
         remainingScales += amount;
-        UpdateScalesUI();
+    }
+
+    private IEnumerator AnimateScales(int startValue, int endValue)
+    {
+        float duration = 0.5f; // half a second for the animation
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            int displayedValue = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, t));
+            if (scalesText != null)
+                scalesText.text = displayedValue.ToString();
+            yield return null;
+        }
+
+        // Ensure final value is correct
+        if (scalesText != null)
+            scalesText.text = endValue.ToString();
     }
 
     public void UpdateScalesUI()
@@ -99,9 +121,9 @@ public class StatManager : MonoBehaviour
             scalesText.text = remainingScales.ToString();
     }
 
-    // Called by enemy damage
     public void AddScore(int amount)
     {
         totalScore += amount;
+        AddScales(amount * 10); // Multiply by 10 for scales
     }
 }

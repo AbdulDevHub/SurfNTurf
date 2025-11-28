@@ -9,7 +9,7 @@ public class HoverAndClickQuickOutline : MonoBehaviour
 
     void Start()
     {
-        cursorManager = FindObjectOfType<CursorManager>();
+        cursorManager = Object.FindFirstObjectByType<CursorManager>();
 
         Outline[] outlines = Object.FindObjectsByType<Outline>(FindObjectsSortMode.None);
         foreach (var o in outlines)
@@ -20,7 +20,6 @@ public class HoverAndClickQuickOutline : MonoBehaviour
 
     void Update()
     {
-        // Don't override if pointer is over a UI element
         if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             return;
 
@@ -46,7 +45,7 @@ public class HoverAndClickQuickOutline : MonoBehaviour
                     Debug.Log("Clicked: " + hit.collider.gameObject.name);
                 }
 
-                return; // exit to prevent resetting
+                return;
             }
         }
 

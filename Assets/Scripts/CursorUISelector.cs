@@ -13,10 +13,10 @@ public class CursorUISelector : MonoBehaviour
 
     void Start()
     {
-        cursorManager = FindObjectOfType<CursorManager>();
+        cursorManager = Object.FindFirstObjectByType<CursorManager>();
 
         // Find the raycaster on your Canvas
-        raycaster = FindObjectOfType<Canvas>().GetComponent<GraphicRaycaster>();
+        raycaster = Object.FindFirstObjectByType<Canvas>().GetComponent<GraphicRaycaster>();
         eventSystem = EventSystem.current;
     }
 
