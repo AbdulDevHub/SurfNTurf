@@ -12,12 +12,12 @@ public class GameUIManager : MonoBehaviour
     [Header("Panels")]
     public GameObject towerTypeUI;
     public GameObject towerInfoUI;
-    public Button closeTowerUI; // Universal exit button
 
     [Header("Tower Type Buttons")]
     public Button birdButton;
     public Button bearButton;
     public Button fishermanButton;
+    public Button exitTowerTypeButton;
 
     [Header("Tower Info Buttons")]
     public Button upgradeButton;
@@ -41,7 +41,6 @@ public class GameUIManager : MonoBehaviour
     private string selectedTowerTypeForPlacement = "";
     private Coroutine upgradeButtonShakeCoroutine;
     private Coroutine sellButtonShakeCoroutine;
-    private float lastUIShowTime = -999f;
 
     void Awake()
     {
@@ -58,9 +57,6 @@ public class GameUIManager : MonoBehaviour
         // Hide both panels at start and disable close button
         HideTowerTypeUI();
         HideTowerInfoUI();
-        
-        if (closeTowerUI != null)
-            closeTowerUI.gameObject.SetActive(false);
     }
 
     void SetupButtonListeners()
@@ -75,9 +71,8 @@ public class GameUIManager : MonoBehaviour
         if (fishermanButton != null)
             fishermanButton.onClick.AddListener(() => SelectTowerType("Fisherman"));
 
-        // Universal exit button
-        if (closeTowerUI != null)
-            closeTowerUI.onClick.AddListener(() => ExitAllUI(false));
+        if (exitTowerTypeButton != null)
+            exitTowerTypeButton.onClick.AddListener(ExitAllUI);
 
         // Tower Info UI buttons - only add onClick for when they're enabled
         if (upgradeButton != null)
@@ -86,9 +81,8 @@ public class GameUIManager : MonoBehaviour
         if (sellButton != null)
             sellButton.onClick.AddListener(SellTower);
 
-        // CHANGED: Remove exitTowerInfoButton listener since we're using the universal button
         if (exitTowerInfoButton != null)
-            exitTowerInfoButton.onClick.AddListener(() => ExitAllUI(true));
+            exitTowerInfoButton.onClick.AddListener(ExitAllUI);
 
         // Add EventTriggers for disabled button detection
         AddDisabledButtonDetection(upgradeButton, OnUpgradeButtonClicked);
@@ -229,15 +223,6 @@ public class GameUIManager : MonoBehaviour
     {
         if (towerTypeUI != null)
             towerTypeUI.SetActive(true);
-        
-        // Enable the close button when UI is shown
-        if (closeTowerUI != null)
-        {
-            closeTowerUI.gameObject.SetActive(true);
-        }
-        
-        // ADD THIS LINE - Record when UI was shown
-        lastUIShowTime = Time.time;
             
         selectedTowerTypeForPlacement = "";
     }
@@ -245,22 +230,13 @@ public class GameUIManager : MonoBehaviour
     public void HideTowerTypeUI()
     {
         if (towerTypeUI != null)
-        {
             towerTypeUI.SetActive(false);
-        }
-            
-        // Check this on next frame to avoid race conditions
-        StartCoroutine(CheckBothHiddenNextFrame());
     }
 
     public void ShowTowerInfoUI()
     {
         if (towerInfoUI != null)
             towerInfoUI.SetActive(true);
-            
-        // Enable the close button when UI is shown
-        if (closeTowerUI != null)
-            closeTowerUI.gameObject.SetActive(true);
     }
 
     public void HideTowerInfoUI()
@@ -268,25 +244,16 @@ public class GameUIManager : MonoBehaviour
         if (towerInfoUI != null)
             towerInfoUI.SetActive(false);
             
-        // Check this on next frame to avoid race conditions
-        StartCoroutine(CheckBothHiddenNextFrame());
-            
         selectedTowerTypeForPlacement = "";
     }
 
-    public void ExitAllUI(bool playSound = true)
+    public void ExitAllUI()
     {
-        // ADD THIS CHECK - Ignore if close button pressed too soon after showing UI
-        if (Time.time - lastUIShowTime < 0.1f)
-            return;
-
         if (TowerSpotController.ActiveSpot != null)
             TowerSpotController.ActiveSpot.ExitUIFromUI();
 
         selectedTowerTypeForPlacement = "";
-
-        if (playSound)
-            PlayUISound("Button Click");
+        PlayUISound("Button Click");
     }
 
     void UpdatePlacementInfoUI(string type)
@@ -423,17 +390,6 @@ public class GameUIManager : MonoBehaviour
             bool hasEnoughScales = StatManager.Instance.remainingScales >= upgradeCost;
             upgradeButton.interactable = canUpgrade && hasEnoughScales;
         }
-    }
-
-    private IEnumerator CheckBothHiddenNextFrame()
-    {
-        yield return null; // Wait one frame
-        
-        bool bothHidden = (towerTypeUI == null || !towerTypeUI.activeSelf) && 
-                        (towerInfoUI == null || !towerInfoUI.activeSelf);
-        
-        if (closeTowerUI != null && bothHidden)
-            closeTowerUI.gameObject.SetActive(false);
     }
 
     private void PlayUISound(string soundName)
