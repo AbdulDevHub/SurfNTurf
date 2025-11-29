@@ -96,6 +96,10 @@ public class BearAttack : MonoBehaviour
 
     private void HandleEnemyEnter(Enemy enemy)
     {
+        // Block HiddenEnemy unless bearLevel is 2
+        if (enemy.CompareTag("HiddenEnemy") && bearLevel != 2)
+            return;
+
         if (currentTarget == null)
             currentTarget = enemy;
     }
@@ -154,8 +158,12 @@ public class BearAttack : MonoBehaviour
     {
         if (currentTarget == null) return;
 
+        // Prevent looking at HiddenEnemy unless bear is level 2
+        if (currentTarget.CompareTag("HiddenEnemy") && bearLevel != 2)
+            return;
+
         Vector3 direction = currentTarget.transform.position - transform.position;
-        direction.y = 0; // keep upright
+        direction.y = 0;
 
         if (direction.sqrMagnitude > 0.01f)
         {

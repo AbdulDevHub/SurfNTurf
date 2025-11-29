@@ -155,15 +155,15 @@ public class FishermanAttack : MonoBehaviour
 
     private void HandleEnemyEnter(Enemy enemy)
     {
+        // Block HiddenEnemy unless level 2+
+        if (enemy.CompareTag("HiddenEnemy") && fishermanLevel < 2)
+            return;
+
         if (!enemiesInRange.Contains(enemy))
-        {
             enemiesInRange.Add(enemy);
-        }
 
         if (currentTarget == null)
-        {
             currentTarget = enemy;
-        }
     }
 
     private void HandleEnemyExit(Enemy enemy)
@@ -209,6 +209,14 @@ public class FishermanAttack : MonoBehaviour
                 // Level 1: Direct damage with fishing rod animation
                 if (currentTarget != null)
                 {
+                    // Prevent HiddenEnemy targeting at LV1
+                    if (currentTarget.CompareTag("HiddenEnemy") && fishermanLevel < 2)
+                    {
+                        currentTarget = GetNextTarget();
+                        yield return null;
+                        continue;
+                    }
+
                     // Make fisherman look at the target
                     LookAtTarget(currentTarget.transform.position);
 
@@ -500,14 +508,18 @@ public class FishermanAttack : MonoBehaviour
 
     private void LookAtTarget(Vector3 targetPosition)
     {
+        // Do NOT look at HiddenEnemy unless level 2+
+        if (currentTarget != null &&
+            currentTarget.CompareTag("HiddenEnemy") &&
+            fishermanLevel < 2)
+            return;
+
         Vector3 lookPos = targetPosition;
-        lookPos.y = transform.position.y; // Keep same Y level to prevent tilting
-        
+        lookPos.y = transform.position.y;
+
         Vector3 direction = lookPos - transform.position;
         if (direction != Vector3.zero)
-        {
             transform.rotation = Quaternion.LookRotation(direction);
-        }
     }
 
     private void TrapEnemy(Enemy enemy)

@@ -120,6 +120,10 @@ public class BirdAttack : MonoBehaviour
 
     private void HandleEnemyEnter(Enemy enemy)
     {
+        // Block HiddenEnemy unless bird level is 2+
+        if (enemy.CompareTag("HiddenEnemy") && birdLevel < 2)
+            return;
+
         if (currentTarget == null)
             currentTarget = enemy;
     }
@@ -136,6 +140,14 @@ public class BirdAttack : MonoBehaviour
         {
             if (currentTarget != null)
             {
+                // HiddenEnemy check
+                if (currentTarget.CompareTag("HiddenEnemy") && birdLevel < 2)
+                {
+                    currentTarget = null;
+                    yield return null;
+                    continue;
+                }
+
                 // Play attack animation (move to enemy and back)
                 yield return StartCoroutine(AttackAnimation());
 
@@ -161,6 +173,10 @@ public class BirdAttack : MonoBehaviour
     private IEnumerator AttackAnimation()
     {
         if (currentTarget == null) yield break;
+
+        // ❌ Do not look at or attack HiddenEnemy unless bird is level 2+
+        if (currentTarget.CompareTag("HiddenEnemy") && birdLevel < 2)
+            yield break;
 
         // 🔊 Play Bird Attack sound
         SoundManager.Instance.PlaySound("Bird Attack", transform.position);
