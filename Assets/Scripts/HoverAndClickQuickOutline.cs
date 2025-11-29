@@ -27,24 +27,20 @@ public class HoverAndClickQuickOutline : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
+            // Priority 1: Outline objects
             Outline outline = hit.collider.GetComponent<Outline>();
-
             if (outline != null)
             {
-                if (lastHovered != outline)
-                {
-                    ResetLastHovered();
-                    lastHovered = outline;
-                    lastHovered.enabled = true;
-                }
-
+                HandleOutlineHover(outline);
                 cursorManager.SetPointerCursor();
+                return;
+            }
 
-                if (Input.GetMouseButtonDown(0))
-                {
-                    Debug.Log("Clicked: " + hit.collider.gameObject.name);
-                }
-
+            // Priority 2: TowerSpot
+            TowerSpotController spot = hit.collider.GetComponentInParent<TowerSpotController>();
+            if (spot != null)
+            {
+                cursorManager.SetPointerCursor();
                 return;
             }
         }
@@ -59,6 +55,16 @@ public class HoverAndClickQuickOutline : MonoBehaviour
         {
             lastHovered.enabled = false;
             lastHovered = null;
+        }
+    }
+
+    void HandleOutlineHover(Outline outline)
+    {
+        if (lastHovered != outline)
+        {
+            ResetLastHovered();
+            lastHovered = outline;
+            lastHovered.enabled = true;
         }
     }
 }

@@ -1544,7 +1544,6 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
-  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &6267832578905361054
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1726,7 +1725,6 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
-  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &3415098855303242481
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1869,11 +1867,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!198 &3174197087695542956 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 797784518864179116, guid: a2a060732547fe64581bb0cb3c2bdf1d, type: 3}
-  m_PrefabInstance: {fileID: 2819059457635947776}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3615582694917915601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2278,7 +2271,6 @@ MonoBehaviour:
   returnMoveSpeed: 4
   attackDistance: 0.5
   rotationSpeed: 10
-  magicCircleEffect: {fileID: 3174197087695542956}
 --- !u!54 &417845808831255569
 Rigidbody:
   m_ObjectHideFlags: 0
