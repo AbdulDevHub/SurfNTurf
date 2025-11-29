@@ -93,6 +93,9 @@ public class StatManager : MonoBehaviour
 
         scaleAnimationCoroutine = StartCoroutine(AnimateScales(remainingScales, remainingScales + amount));
         remainingScales += amount;
+        
+        // Refresh UI button states when scales change
+        RefreshTowerUI();
     }
 
     private IEnumerator AnimateScales(int startValue, int endValue)
@@ -124,6 +127,29 @@ public class StatManager : MonoBehaviour
     public void AddScore(int amount)
     {
         totalScore += amount;
-        AddScales(amount * 10); // Multiply by 10 for scales
+        AddScales(amount * 100); // Multiply by 100 for scales
+    }
+
+    private void RefreshTowerUI()
+    {
+        // Only refresh if a tower spot is currently selected and UI is open
+        if (TowerSpotController.ActiveSpot != null && GameUIManager.Instance != null)
+        {
+            // Check which UI is currently open
+            if (GameUIManager.Instance.towerInfoUI != null && GameUIManager.Instance.towerInfoUI.activeSelf)
+            {
+                // Check if we're in placement mode (level 0) or upgrade mode
+                if (TowerSpotController.ActiveSpot.GetCurrentLevel() == 0)
+                {
+                    // In placement mode - refresh placement info
+                    GameUIManager.Instance.RefreshPlacementUI();
+                }
+                else
+                {
+                    // In upgrade mode - refresh tower info
+                    TowerSpotController.ActiveSpot.UpdateTowerInfoUI();
+                }
+            }
+        }
     }
 }

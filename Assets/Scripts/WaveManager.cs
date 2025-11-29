@@ -7,6 +7,7 @@ public class WaveManager : MonoBehaviour
 {
     public Wave[] waves;
     private int waveIndex = 0;
+    public static bool gameOver = false;
 
     [Header("UI")]
     public TMP_Text waveText;
@@ -65,6 +66,7 @@ public class WaveManager : MonoBehaviour
 
     private void Update()
     {
+        if (gameOver) return;
         if (waveIndex >= waves.Length) return;
 
         if (!waveInProgress)
@@ -106,6 +108,8 @@ public class WaveManager : MonoBehaviour
         // Spawn enemies
         foreach (GameObject prefab in enemyPool)
         {
+            if (gameOver) yield break;
+
             EnemyPath path = wave.availablePaths[Random.Range(0, wave.availablePaths.Length)];
             GameObject enemyGO = Instantiate(prefab, path.GetSpawnPoint(), Quaternion.identity);
 
@@ -118,7 +122,10 @@ public class WaveManager : MonoBehaviour
 
         // Wait until all enemies die
         while (EnemyManager.aliveEnemies > 0)
+        {
+            if (gameOver) yield break; // ⬅ ADD THIS
             yield return null;
+        }
 
         // Handle wave completion
         yield return StartCoroutine(HandleWaveCompletion(waveIndex));
@@ -140,20 +147,21 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator HandleWaveCompletion(int completedWaveIndex)
     {
+        if (gameOver) yield break;
         int completedWaveNumber = completedWaveIndex + 1;
+        yield return new WaitForSeconds(2f);
 
         bool dam1BrokeThisWave = (dam1BreakWave > 0 && completedWaveNumber == dam1BreakWave);
         bool dam2BrokeThisWave = (dam2BreakWave > 0 && completedWaveNumber == dam2BreakWave);
 
-        // --- PLAY THE CORRECT SOUND ---
-        if (dam1BrokeThisWave || dam2BrokeThisWave) {
-            Vector3 pos = dam1BrokeThisWave ? dam1.transform.position : dam2.transform.position;
-            SoundManager.Instance.PlaySound("Dam Explosion", pos);
+        // If this is the LAST wave → play Victory instead of Wave End
+        if (!dam1BrokeThisWave && !dam2BrokeThisWave)
+        {
+            if (completedWaveIndex == waves.Length - 1)
+                SoundManager.Instance.PlaySound("Victory");
+            else
+                SoundManager.Instance.PlaySound("Wave End");
         }
-        else {
-            SoundManager.Instance.PlaySound("Wave End Sound");
-        }
-        // ------------------------------
 
         // DAM 1
         if (dam1BrokeThisWave && dam1 != null)
@@ -195,6 +203,8 @@ public class WaveManager : MonoBehaviour
         // Camera moves to dam and STAYS there
         if (CameraShake.Instance != null)
             yield return StartCoroutine(CameraShake.Instance.FocusOnPoint(damPos, 12f, 0.7f));
+
+        SoundManager.Instance.PlaySound("Dam Explosion");
 
         // Hide dam mesh
         if (damMesh != null)

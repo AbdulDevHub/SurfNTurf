@@ -89,4 +89,10 @@ public class SoundManager : MonoBehaviour
             ? soundDictionary[name].volume
             : 0f;
     }
+
+    public float GetClipLength(string soundName)
+    {
+        Sound found = sounds.Find(s => s.soundName == soundName);
+        return found != null && found.clip != null ? found.clip.length : 1f;
+    }
 }

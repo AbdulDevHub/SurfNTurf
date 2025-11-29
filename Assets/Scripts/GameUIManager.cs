@@ -397,4 +397,13 @@ public class GameUIManager : MonoBehaviour
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlaySound(soundName);
     }
+
+    public void RefreshPlacementUI()
+    {
+        // Only refresh if we're actually in placement mode with a selected tower type
+        if (!string.IsNullOrEmpty(selectedTowerTypeForPlacement) && TowerSpotController.ActiveSpot != null)
+        {
+            UpdatePlacementInfoUI(selectedTowerTypeForPlacement);
+        }
+    }
 }

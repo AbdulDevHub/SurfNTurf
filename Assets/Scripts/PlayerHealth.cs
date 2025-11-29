@@ -58,6 +58,15 @@ public class PlayerHealth : MonoBehaviour
 
             shakeRoutine = StartCoroutine(ShakeHealthBar());
         }
+
+        // Check for death
+        if (currentHealth <= 0)
+        {
+            if (healthAnimRoutine != null)
+                StartCoroutine(WaitForHealthBarThenDeath());
+            else
+                StartCoroutine(HandlePlayerDeath());
+        }
     }
 
     private IEnumerator AnimateHealthBar()
@@ -80,6 +89,7 @@ public class PlayerHealth : MonoBehaviour
 
         healthGreen.fillAmount = targetFill;
         UpdateHealthText();
+        healthAnimRoutine = null;
     }
 
     private IEnumerator ShakeHealthBar()
@@ -115,5 +125,31 @@ public class PlayerHealth : MonoBehaviour
     {
         if (healthText != null)
             healthText.text = $"{currentHealth} / {maxHealth}";
+    }
+
+    private IEnumerator HandlePlayerDeath()
+    {
+        // Play the Lose sound
+        SoundManager.Instance.PlaySound("Lose");
+        WaveManager.gameOver = true;
+
+        // Disable further gameplay
+        Time.timeScale = 0f; // freeze game logic EXCEPT coroutines & audio
+
+        // Wait for sound to finish
+        float loseSoundLength = SoundManager.Instance.GetClipLength("Lose");
+        yield return new WaitForSecondsRealtime(loseSoundLength);
+
+        // Load EndScene
+        UnityEngine.SceneManagement.SceneManager.LoadScene("EndScene");
+    }
+
+    private IEnumerator WaitForHealthBarThenDeath()
+    {
+        // Wait for the health bar animation to complete
+        yield return healthAnimRoutine;
+
+        // Now handle death
+        yield return StartCoroutine(HandlePlayerDeath());
     }
 }

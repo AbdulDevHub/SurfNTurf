@@ -131,7 +131,7 @@ public class TowerSpotController : MonoBehaviour
     // ============================================================
     // UI Updates
     // ============================================================
-    void UpdateTowerInfoUI()
+    public void UpdateTowerInfoUI()
     {
         if (currentLevel == 0) return;
 
