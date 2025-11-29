@@ -51,6 +51,8 @@ public class PlayerHealth : MonoBehaviour
         // Trigger shake if health actually decreased
         if (currentHealth < oldHealth)
         {
+            SoundManager.Instance.PlaySound("Lose Health");
+
             if (shakeRoutine != null)
                 StopCoroutine(shakeRoutine);
 

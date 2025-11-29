@@ -106,6 +106,8 @@ public class TowerSpotController : MonoBehaviour
         isSelected = true;
         ActiveSpot = this;
 
+        SoundManager.Instance.PlaySound("Tower Spot Select", transform.position);
+
         if (circleRenderer != null)
             circleRenderer.material.color = selectedColor;
 

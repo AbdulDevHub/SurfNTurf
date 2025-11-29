@@ -89,7 +89,7 @@ public class GameUIManager : MonoBehaviour
         AddDisabledButtonDetection(sellButton, OnSellButtonClicked);
     }
 
-    // NEW: Add EventTrigger to detect clicks even when button is disabled
+    // Add EventTrigger to detect clicks even when button is disabled
     void AddDisabledButtonDetection(Button button, System.Action callback)
     {
         if (button == null) return;
@@ -104,38 +104,37 @@ public class GameUIManager : MonoBehaviour
         trigger.triggers.Add(entry);
     }
 
-    // NEW: Handle upgrade button clicks (works even when disabled)
+    // Handle upgrade button clicks (works even when disabled)
     void OnUpgradeButtonClicked()
     {
         // If button is disabled, shake it
         if (upgradeButton != null && !upgradeButton.interactable)
         {
+            PlayUISound("Button Unclickable");
+
             if (upgradeButtonShakeCoroutine == null)
-            {
                 upgradeButtonShakeCoroutine = StartCoroutine(ShakeButton(upgradeButton, () => upgradeButtonShakeCoroutine = null));
-            }
         }
-        // If enabled, the onClick listener will handle it
     }
 
-    // NEW: Handle sell button clicks (works even when disabled)
+    // Handle sell button clicks (works even when disabled)
     void OnSellButtonClicked()
     {
         // If button is disabled, shake it
         if (sellButton != null && !sellButton.interactable)
         {
+            PlayUISound("Button Unclickable");
+
             if (sellButtonShakeCoroutine == null)
-            {
                 sellButtonShakeCoroutine = StartCoroutine(ShakeButton(sellButton, () => sellButtonShakeCoroutine = null));
-            }
         }
-        // If enabled, the onClick listener will handle it
     }
 
     void SelectTowerType(string type)
     {
         if (TowerSpotController.ActiveSpot != null && TowerSpotController.ActiveSpot.GetCurrentLevel() == 0)
         {
+            PlayUISound("Tower Type Select");
             selectedTowerTypeForPlacement = type;
             
             // Switch to tower info UI showing placement info
@@ -160,6 +159,7 @@ public class GameUIManager : MonoBehaviour
 
             // Place the tower
             TowerSpotController.ActiveSpot.BuildTowerFromUI(selectedTowerTypeForPlacement);
+            PlayUISound("Place Tower Button");
             selectedTowerTypeForPlacement = "";
         }
         // If we're in upgrade mode
@@ -206,13 +206,17 @@ public class GameUIManager : MonoBehaviour
     void UpgradeTower()
     {
         if (TowerSpotController.ActiveSpot != null)
+        {
+            PlayUISound("Upgrade Tower Button");
             TowerSpotController.ActiveSpot.UpgradeTowerFromUI();
+        }
     }
 
     void SellTower()
     {
         if (TowerSpotController.ActiveSpot == null) return;
-        
+
+        PlayUISound("Sell Tower Button");
         TowerSpotController.ActiveSpot.DeleteTowerFromUI();
     }
 
@@ -249,6 +253,7 @@ public class GameUIManager : MonoBehaviour
         if (TowerSpotController.ActiveSpot != null)
             TowerSpotController.ActiveSpot.ExitUIFromUI();
         selectedTowerTypeForPlacement = "";
+        PlayUISound("Button Click");
     }
 
     void UpdatePlacementInfoUI(string type)
@@ -385,5 +390,11 @@ public class GameUIManager : MonoBehaviour
             bool hasEnoughScales = StatManager.Instance.remainingScales >= upgradeCost;
             upgradeButton.interactable = canUpgrade && hasEnoughScales;
         }
+    }
+
+    private void PlayUISound(string soundName)
+    {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySound(soundName);
     }
 }

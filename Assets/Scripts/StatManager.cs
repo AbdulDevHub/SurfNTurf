@@ -14,10 +14,10 @@ public class StatManager : MonoBehaviour
     public int defaultScales = 10000;
 
     // Stats
-    public float totalTime = 0f;
-    public int remainingScales;
-    public int remainingHealth;
-    public int totalScore = 0;
+    [HideInInspector] public float totalTime = 0f;
+    [HideInInspector] public int remainingScales;
+    [HideInInspector] public int remainingHealth;
+    [HideInInspector] public int totalScore = 0;
 
     private PlayerHealth playerHealth;
 

@@ -20,6 +20,20 @@ public class WaveManager : MonoBehaviour
     public float timeBeforeFirstWave = 5f;
     public float spawnInterval = 0.5f;
 
+    [Header("Dam Break Settings")]
+    [Tooltip("Wave number (1-based) that breaks Dam 1. Set to 0 to disable.")]
+    public int dam1BreakWave = 1;
+
+    [Tooltip("Wave number (1-based) that breaks Dam 2. Set to 0 to disable.")]
+    public int dam2BreakWave = 2;
+
+    [Header("Dam Break Messages")]
+    [Tooltip("Text added to the wave message when Dam 1 breaks.")]
+    public string dam1Message = "The Dam Broke!";
+
+    [Tooltip("Text added to the wave message when Dam 2 breaks.")]
+    public string dam2Message = "The Dam Broke!";
+
     [Header("Dams")]
     public GameObject dam1;
     public GameObject dam2;
@@ -126,37 +140,49 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator HandleWaveCompletion(int completedWaveIndex)
     {
-        // ----------------------------------
-        // WAVE 1 → BREAK DAM 1
-        // ----------------------------------
-        if (completedWaveIndex == 0 && dam1 != null)
-        {
+        int completedWaveNumber = completedWaveIndex + 1;
+
+        bool dam1BrokeThisWave = (dam1BreakWave > 0 && completedWaveNumber == dam1BreakWave);
+        bool dam2BrokeThisWave = (dam2BreakWave > 0 && completedWaveNumber == dam2BreakWave);
+
+        // --- PLAY THE CORRECT SOUND ---
+        if (dam1BrokeThisWave || dam2BrokeThisWave) {
+            Vector3 pos = dam1BrokeThisWave ? dam1.transform.position : dam2.transform.position;
+            SoundManager.Instance.PlaySound("Dam Explosion", pos);
+        }
+        else {
+            SoundManager.Instance.PlaySound("Wave End Sound");
+        }
+        // ------------------------------
+
+        // DAM 1
+        if (dam1BrokeThisWave && dam1 != null)
             yield return StartCoroutine(BreakDam(dam1, dam1Mesh, dam1Explosion));
-        }
 
-        // ----------------------------------
-        // WAVE 2 → BREAK DAM 2
-        // ----------------------------------
-        else if (completedWaveIndex == 1 && dam2 != null)
-        {
+        // DAM 2
+        if (dam2BrokeThisWave && dam2 != null)
             yield return StartCoroutine(BreakDam(dam2, dam2Mesh, dam2Explosion));
-        }
 
-        // ----------------------------------
-        // WAVE MESSAGE
-        // ----------------------------------
+        // BASE WAVE MESSAGE
         Wave wave = waves[completedWaveIndex];
+        string finalMessage = wave.waveMessage;
 
-        if (!string.IsNullOrWhiteSpace(wave.waveMessage) && waveMessagePanel != null)
+        // OPTIONAL DAM BREAK MESSAGE
+        if (dam1BrokeThisWave && !string.IsNullOrWhiteSpace(dam1Message))
+            finalMessage += " " + dam1Message;
+
+        if (dam2BrokeThisWave && !string.IsNullOrWhiteSpace(dam2Message))
+            finalMessage += " " + dam2Message;
+
+        // DISPLAY WAVE MESSAGE
+        if (!string.IsNullOrWhiteSpace(finalMessage) && waveMessagePanel != null)
         {
             waveMessagePanel.SetActive(true);
 
             if (waveMessageText != null)
-                waveMessageText.text = wave.waveMessage;
+                waveMessageText.text = finalMessage;
 
-            float showTime = wave.delayAfterWave;
-
-            yield return new WaitForSeconds(showTime);
+            yield return new WaitForSeconds(wave.delayAfterWave);
 
             waveMessagePanel.SetActive(false);
         }
@@ -177,9 +203,6 @@ public class WaveManager : MonoBehaviour
         // Play explosion
         if (explosion != null)
             explosion.Play();
-
-        // 🔊 PLAY SOUND HERE
-        SoundManager.Instance.PlaySound("Dam Explosion", damPos);
 
         // Shake camera without snapping to old position
         if (CameraShake.Instance != null)
