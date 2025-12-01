@@ -12,15 +12,18 @@ public class BearAttack : MonoBehaviour
     public float attackAnimationDuration = 1f;
 
     [Header("Range Trigger")]
-    public Collider rangeTrigger; // Assign Range1 for LV1, Range2 for LV2
+    public Collider rangeTrigger;
 
-    // Level-based stats
+    // Level stats
     private int damage;
     private float attackInterval;
 
-    private BearRangeTrigger rangeTriggerScript;
+    // Target & enemy tracking
+    private List<Enemy> enemiesInRange = new List<Enemy>();
     private Enemy currentTarget = null;
-    private Coroutine attackCoroutine;
+    private Coroutine attackRoutine;
+
+    private BearRangeTrigger rangeTriggerScript;
 
     private void Awake()
     {
@@ -36,31 +39,20 @@ public class BearAttack : MonoBehaviour
 
         rangeTriggerScript = rangeTrigger.GetComponent<BearRangeTrigger>();
         if (rangeTriggerScript == null)
-        {
-            Debug.LogError($"{gameObject.name}: BearRangeTrigger script not found on range trigger!");
-        }
+            Debug.LogError($"{gameObject.name}: BearRangeTrigger script missing on range trigger!");
     }
 
     private void SetStatsForLevel()
     {
         switch (bearLevel)
         {
-            case 1:
-                damage = 3;
-                attackInterval = 3f;
-                break;
-            case 2:
-                damage = 5;
-                attackInterval = 2f;
-                break;
-            case 3:
-                damage = 8;
-                attackInterval = 1.5f;
-                break;
+            case 1: damage = 3; attackInterval = 3f; break;
+            case 2: damage = 5; attackInterval = 2f; break;
+            case 3: damage = 8; attackInterval = 1.5f; break;
             default:
                 damage = 3;
                 attackInterval = 3f;
-                Debug.LogWarning($"{gameObject.name}: Unknown bear level {bearLevel}, using default stats");
+                Debug.LogWarning($"{gameObject.name}: Unknown bearLevel {bearLevel}, using defaults.");
                 break;
         }
     }
@@ -73,8 +65,7 @@ public class BearAttack : MonoBehaviour
             rangeTriggerScript.OnEnemyExit += HandleEnemyExit;
         }
 
-        if (attackCoroutine == null)
-            attackCoroutine = StartCoroutine(AttackRoutine());
+        attackRoutine = StartCoroutine(AttackLoop());
     }
 
     private void OnDisable()
@@ -85,20 +76,24 @@ public class BearAttack : MonoBehaviour
             rangeTriggerScript.OnEnemyExit -= HandleEnemyExit;
         }
 
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
-        }
+        if (attackRoutine != null)
+            StopCoroutine(attackRoutine);
 
+        enemiesInRange.Clear();
         currentTarget = null;
     }
 
+    // ——————————————————————————————————————
+    // Trigger Management
+    // ——————————————————————————————————————
+
     private void HandleEnemyEnter(Enemy enemy)
     {
-        // Block HiddenEnemy unless bearLevel is 2
-        if (enemy.CompareTag("HiddenEnemy") && bearLevel != 2)
+        if (!CanSeeEnemy(enemy))
             return;
+
+        if (!enemiesInRange.Contains(enemy))
+            enemiesInRange.Add(enemy);
 
         if (currentTarget == null)
             currentTarget = enemy;
@@ -106,73 +101,131 @@ public class BearAttack : MonoBehaviour
 
     private void HandleEnemyExit(Enemy enemy)
     {
+        enemiesInRange.Remove(enemy);
+
         if (currentTarget == enemy)
             currentTarget = null;
     }
 
+    private bool CanSeeEnemy(Enemy enemy)
+    {
+        return !(enemy.CompareTag("HiddenEnemy") && bearLevel != 2);
+    }
+
+    // ——————————————————————————————————————
+    // Update: Rotation
+    // ——————————————————————————————————————
+
     private void Update()
     {
-        // Rotate every frame toward the enemy
         if (currentTarget != null)
-        {
-            LookAtTarget();
-        }
+            RotateToward(currentTarget);
     }
 
-    private IEnumerator AttackRoutine()
+    private void RotateToward(Enemy target)
     {
-        while (true)
-        {
-            if (currentTarget != null)
-            {
-                // Play random attack animation
-                string[] attacks = { "Attack1", "Attack2", "Attack3", "Attack5" };
-                string attackAnim = attacks[Random.Range(0, attacks.Length)];
-                animator?.Play(attackAnim);
-
-                SoundManager.Instance.PlaySound("Bear Attack", transform.position);
-
-                yield return new WaitForSeconds(attackAnimationDuration);
-
-                if (currentTarget != null)
-                    currentTarget.TakeDamage(damage);
-
-                animator?.Play("Sit");
-
-                float remainingCooldown = attackInterval - attackAnimationDuration;
-                if (remainingCooldown > 0)
-                    yield return new WaitForSeconds(remainingCooldown);
-
-                if (currentTarget != null && currentTarget.CurrentHealth <= 0)
-                    currentTarget = null;
-            }
-            else
-            {
-                animator?.Play("Idle");
-                yield return null;
-            }
-        }
-    }
-
-    private void LookAtTarget()
-    {
-        if (currentTarget == null) return;
-
-        // Prevent looking at HiddenEnemy unless bear is level 2
-        if (currentTarget.CompareTag("HiddenEnemy") && bearLevel != 2)
+        if (!CanSeeEnemy(target))
             return;
 
-        Vector3 direction = currentTarget.transform.position - transform.position;
-        direction.y = 0;
+        Vector3 dir = target.transform.position - transform.position;
+        dir.y = 0;
 
-        if (direction.sqrMagnitude > 0.01f)
+        if (dir.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Quaternion lookRot = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
-                targetRotation,
+                lookRot,
                 Time.deltaTime * 8f
             );
         }
+    }
+
+    // ——————————————————————————————————————
+    // Attack Loop
+    // ——————————————————————————————————————
+
+    private IEnumerator AttackLoop()
+    {
+        while (true)
+        {
+            CleanupNullEnemies();
+
+            if (currentTarget == null)
+                currentTarget = SelectNextTarget();
+
+            if (currentTarget == null)
+            {
+                animator?.Play("Idle");
+                yield return null;
+                continue;
+            }
+
+            yield return StartCoroutine(PerformAttack());
+
+            if (currentTarget != null && currentTarget.CurrentHealth <= 0)
+            {
+                enemiesInRange.Remove(currentTarget);
+                currentTarget = null;
+            }
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator PerformAttack()
+    {
+        string[] attacks = { "Attack1", "Attack2", "Attack3", "Attack5" };
+        animator?.Play(attacks[Random.Range(0, attacks.Length)]);
+        SoundManager.Instance.PlaySound("Bear Attack", transform.position);
+
+        yield return new WaitForSeconds(attackAnimationDuration);
+
+        if (currentTarget != null)
+            currentTarget.TakeDamage(damage);
+
+        animator?.Play("Sit");
+
+        float cooldown = attackInterval - attackAnimationDuration;
+        if (cooldown > 0)
+            yield return new WaitForSeconds(cooldown);
+    }
+
+    // ——————————————————————————————————————
+    // Target Selection & Cleanup
+    // ——————————————————————————————————————
+
+    private void CleanupNullEnemies()
+    {
+        for (int i = enemiesInRange.Count - 1; i >= 0; i--)
+        {
+            if (enemiesInRange[i] == null)
+                enemiesInRange.RemoveAt(i);
+        }
+    }
+
+    private Enemy SelectNextTarget()
+    {
+        if (enemiesInRange.Count == 0)
+            return null;
+
+        // Choose closest enemy to the bear
+        float minDist = float.MaxValue;
+        Enemy closest = null;
+
+        foreach (var enemy in enemiesInRange)
+        {
+            if (enemy == null) continue;
+            if (!CanSeeEnemy(enemy)) continue;
+
+            float dist = (enemy.transform.position - transform.position).sqrMagnitude;
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = enemy;
+            }
+        }
+
+        return closest;
     }
 }

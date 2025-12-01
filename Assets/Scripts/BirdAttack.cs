@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BirdAttack : MonoBehaviour
@@ -7,217 +8,253 @@ public class BirdAttack : MonoBehaviour
     public int birdLevel = 1;
 
     [Header("Range Trigger")]
-    public Collider rangeTrigger; // Assign Range3 for LV1, Range4 for LV2, Range5 for LV3
+    public Collider rangeTrigger;
 
-    [Header("Attack Animation")]
-    public float attackMoveSpeed = 6f; // Speed of movement toward enemy
-    public float returnMoveSpeed = 4f; // Speed of returning to original position
-    public float attackDistance = 0.5f; // How close to get to the enemy
-    public float rotationSpeed = 10f; // How fast the bird rotates to face enemy
+    [Header("Movement & Attack")]
+    public float attackMoveSpeed = 6f;
+    public float returnMoveSpeed = 4f;
+    public float attackDistance = 0.5f;
+    public float rotationSpeed = 10f;
 
-    // Level-based stats
     private int damage;
     private float attackInterval;
 
-    private BirdRangeTrigger rangeTriggerScript;
-    private Enemy currentTarget = null;
-    private Coroutine attackCoroutine;
+    private List<Enemy> enemiesInRange = new List<Enemy>();
+    private Enemy currentTarget;
+    private Coroutine attackRoutine;
 
-    // Original transform data
     private Vector3 originalPosition;
+    private Quaternion originalRotation;
+
+    private BirdRangeTrigger rangeTriggerScript;
 
     private void Awake()
     {
-        // Store original position and rotation
         originalPosition = transform.position;
+        originalRotation = transform.rotation;
 
-        // Set stats based on bird level
         SetStatsForLevel();
 
         if (rangeTrigger == null)
         {
-            Debug.LogError($"{gameObject.name}: Range trigger not assigned!");
+            Debug.LogError($"{gameObject.name}: No range trigger assigned!");
             return;
         }
 
-        // Ensure trigger collider is set
         rangeTrigger.isTrigger = true;
-
-        // Get the BirdRangeTrigger component from the assigned collider
         rangeTriggerScript = rangeTrigger.GetComponent<BirdRangeTrigger>();
+
         if (rangeTriggerScript == null)
-        {
-            Debug.LogError($"{gameObject.name}: BirdRangeTrigger script not found on range trigger!");
-        }
+            Debug.LogError($"{gameObject.name}: BirdRangeTrigger missing on range trigger!");
     }
 
     private void SetStatsForLevel()
     {
         switch (birdLevel)
         {
-            case 1:
-                damage = 1;
-                attackInterval = 2f;
-                break;
-            case 2:
-                damage = 2;
-                attackInterval = 2f;
-                break;
-            case 3:
-                damage = 4;
-                attackInterval = 1f;
-                break;
+            case 1: damage = 1; attackInterval = 2f; break;
+            case 2: damage = 2; attackInterval = 2f; break;
+            case 3: damage = 4; attackInterval = 1f; break;
             default:
-                damage = 1;
-                attackInterval = 2f;
-                Debug.LogWarning($"{gameObject.name}: Unknown bird level {birdLevel}, using default stats");
+                damage = 1; attackInterval = 2f;
+                Debug.LogWarning($"Invalid birdLevel {birdLevel}, using defaults.");
                 break;
         }
     }
 
     private void OnEnable()
     {
-        // Subscribe to THIS specific range trigger's events
         if (rangeTriggerScript != null)
         {
             rangeTriggerScript.OnEnemyEnter += HandleEnemyEnter;
             rangeTriggerScript.OnEnemyExit += HandleEnemyExit;
         }
 
-        // Start the attack routine when enabled
-        if (attackCoroutine == null)
-        {
-            attackCoroutine = StartCoroutine(AttackRoutine());
-        }
+        attackRoutine = StartCoroutine(AttackLoop());
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from THIS specific range trigger's events
         if (rangeTriggerScript != null)
         {
             rangeTriggerScript.OnEnemyEnter -= HandleEnemyEnter;
             rangeTriggerScript.OnEnemyExit -= HandleEnemyExit;
         }
 
-        // Stop the attack routine when disabled
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
-        }
+        if (attackRoutine != null)
+            StopCoroutine(attackRoutine);
 
-        // Reset to original transform
-        ResetTransform();
-
+        enemiesInRange.Clear();
         currentTarget = null;
+
+        ResetTransform();
     }
 
     private void ResetTransform()
     {
         transform.position = originalPosition;
+        transform.rotation = originalRotation;
     }
+
+    // ——————————————————————————————————————————————
+    // TRIGGER EVENTS
+    // ——————————————————————————————————————————————
 
     private void HandleEnemyEnter(Enemy enemy)
     {
-        // Block HiddenEnemy unless bird level is 2+
-        if (enemy.CompareTag("HiddenEnemy") && birdLevel < 2)
+        if (!CanSeeEnemy(enemy))
             return;
 
+        if (!enemiesInRange.Contains(enemy))
+            enemiesInRange.Add(enemy);
+
         if (currentTarget == null)
-            currentTarget = enemy;
+            currentTarget = SelectNextTarget();
     }
 
     private void HandleEnemyExit(Enemy enemy)
     {
+        enemiesInRange.Remove(enemy);
+
         if (currentTarget == enemy)
             currentTarget = null;
     }
 
-    private IEnumerator AttackRoutine()
+    private bool CanSeeEnemy(Enemy e)
+    {
+        return !(e.CompareTag("HiddenEnemy") && birdLevel < 2);
+    }
+
+    // ——————————————————————————————————————————————
+    // MAIN ATTACK LOOP
+    // ——————————————————————————————————————————————
+
+    private IEnumerator AttackLoop()
     {
         while (true)
         {
-            if (currentTarget != null)
+            CleanupNullEnemies();
+
+            if (currentTarget == null)
+                currentTarget = SelectNextTarget();
+
+            if (currentTarget == null)
             {
-                // HiddenEnemy check
-                if (currentTarget.CompareTag("HiddenEnemy") && birdLevel < 2)
-                {
-                    currentTarget = null;
-                    yield return null;
-                    continue;
-                }
-
-                // Play attack animation (move to enemy and back)
-                yield return StartCoroutine(AttackAnimation());
-
-                // Deal damage after reaching the enemy
-                if (currentTarget != null)
-                    currentTarget.TakeDamage(damage);
-
-                // Wait for remaining attack interval
-                yield return new WaitForSeconds(attackInterval);
-
-                // Reset if enemy is dead
-                if (currentTarget != null && currentTarget.CurrentHealth <= 0)
-                    currentTarget = null;
-            }
-            else
-            {
-                // No target, just wait for next frame
                 yield return null;
+                continue;
             }
+
+            yield return StartCoroutine(DoAttackSequence());
+
+            if (currentTarget != null && currentTarget.CurrentHealth <= 0)
+            {
+                enemiesInRange.Remove(currentTarget);
+                currentTarget = null;
+            }
+
+            yield return null;
         }
     }
 
-    private IEnumerator AttackAnimation()
-    {
-        if (currentTarget == null) yield break;
+    // ——————————————————————————————————————————————
+    // ATTACK SEQUENCE
+    // ——————————————————————————————————————————————
 
-        // ❌ Do not look at or attack HiddenEnemy unless bird is level 2+
-        if (currentTarget.CompareTag("HiddenEnemy") && birdLevel < 2)
+    private IEnumerator DoAttackSequence()
+    {
+        if (currentTarget == null || !CanSeeEnemy(currentTarget))
             yield break;
 
-        // 🔊 Play Bird Attack sound
         SoundManager.Instance.PlaySound("Bird Attack", transform.position);
 
-        // Phase 1: Look at and move toward enemy
-        Vector3 targetPosition = currentTarget.transform.position;
-        Vector3 directionToEnemy = (targetPosition - transform.position).normalized;
-        Vector3 attackPosition = targetPosition - (directionToEnemy * attackDistance);
+        // Move to enemy
+        yield return StartCoroutine(MoveToEnemy());
 
-        // Rotate toward enemy while moving
-        while (Vector3.Distance(transform.position, attackPosition) > 0.1f)
+        // Deal damage IF still valid target
+        if (currentTarget != null)
+            currentTarget.TakeDamage(damage);
+
+        // Attack cooldown
+        yield return new WaitForSeconds(attackInterval);
+
+        // Return home
+        yield return StartCoroutine(ReturnHome());
+    }
+
+    private IEnumerator MoveToEnemy()
+    {
+        while (currentTarget != null)
         {
-            if (currentTarget == null) break;
+            Vector3 enemyPos = currentTarget.transform.position;
+            Vector3 dir = (enemyPos - transform.position).normalized;
+            Vector3 attackPos = enemyPos - dir * attackDistance;
 
-            // Update target position in case enemy is moving
-            targetPosition = currentTarget.transform.position;
-            directionToEnemy = (targetPosition - transform.position).normalized;
-            attackPosition = targetPosition - (directionToEnemy * attackDistance);
+            // Rotate toward enemy
+            Quaternion lookRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, rotationSpeed * Time.deltaTime);
 
-            // Rotate to face enemy
-            Quaternion targetRotation = Quaternion.LookRotation(directionToEnemy);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            // Move toward attack position
+            transform.position = Vector3.MoveTowards(transform.position, attackPos, attackMoveSpeed * Time.deltaTime);
 
-            // Move toward enemy
-            transform.position = Vector3.MoveTowards(transform.position, attackPosition, attackMoveSpeed * Time.deltaTime);
+            if (Vector3.Distance(transform.position, attackPos) < 0.1f)
+                break;
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator ReturnHome()
+    {
+        while (Vector3.Distance(transform.position, originalPosition) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                originalPosition,
+                returnMoveSpeed * Time.deltaTime
+            );
 
             yield return null;
         }
 
-        // Small pause at attack position
-        yield return new WaitForSeconds(0.1f);
+        ResetTransform();
+    }
 
-        // Phase 2: Return to original position and rotation
-        while (Vector3.Distance(transform.position, originalPosition) > 0.1f) {
-            // Move back to original position
-            transform.position = Vector3.MoveTowards(transform.position, originalPosition, returnMoveSpeed * Time.deltaTime);
+    // ——————————————————————————————————————————————
+    // TARGET MANAGEMENT
+    // ——————————————————————————————————————————————
 
-            yield return null;
+    private void CleanupNullEnemies()
+    {
+        for (int i = enemiesInRange.Count - 1; i >= 0; i--)
+        {
+            if (enemiesInRange[i] == null || enemiesInRange[i].CurrentHealth <= 0)
+                enemiesInRange.RemoveAt(i);
+        }
+    }
+
+    private Enemy SelectNextTarget()
+    {
+        if (enemiesInRange.Count == 0)
+            return null;
+
+        // Choose closest valid enemy
+        float minDist = float.MaxValue;
+        Enemy closest = null;
+
+        foreach (var enemy in enemiesInRange)
+        {
+            if (enemy == null) continue;
+            if (!CanSeeEnemy(enemy)) continue;
+
+            float dist = (enemy.transform.position - originalPosition).sqrMagnitude;
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = enemy;
+            }
         }
 
-        // Snap to exact original transform
-        transform.position = originalPosition;
+        return closest;
     }
 }
