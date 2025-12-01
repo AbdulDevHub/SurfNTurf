@@ -5,20 +5,23 @@ using UnityEngine.UI;
 public class MainMenuScript : MonoBehaviour
 {
     [Header("Button Sounds")]
-    [SerializeField] private AudioClip clickSound;   // For Play, Quit, Instructions, Back buttons
+    [SerializeField] private AudioClip clickSound;
 
     [Header("Menu Music")]
     [SerializeField] private AudioClip menuMusic;
     private AudioSource musicSource;
 
     [Header("UI Panels")]
-    [SerializeField] private GameObject instructionsPanel;  // Assign the panel in Inspector
+    [SerializeField] private GameObject instructionsPanel;
+    [SerializeField] private GameObject storyPanel;   // NEW
 
     [Header("UI Buttons")]
     [SerializeField] private Button playButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private Button instructionsButton;
-    [SerializeField] private Button backButton;  // Back button inside the instructions panel
+    [SerializeField] private Button backButton;
+    [SerializeField] private Button storyButton;       // NEW
+    [SerializeField] private Button storyBackButton;   // NEW
 
     void Start()
     {
@@ -32,7 +35,7 @@ public class MainMenuScript : MonoBehaviour
             musicSource.Play();
         }
 
-        // Add button listeners
+        // Button listeners
         if (playButton != null)
             playButton.onClick.AddListener(PlayGame);
 
@@ -45,9 +48,18 @@ public class MainMenuScript : MonoBehaviour
         if (backButton != null)
             backButton.onClick.AddListener(CloseInstructions);
 
-        // Make sure instructions panel starts closed
+        if (storyButton != null)
+            storyButton.onClick.AddListener(OpenStory);      // NEW
+
+        if (storyBackButton != null)
+            storyBackButton.onClick.AddListener(CloseStory); // NEW
+
+        // Ensure panels start hidden
         if (instructionsPanel != null)
             instructionsPanel.SetActive(false);
+
+        if (storyPanel != null)
+            storyPanel.SetActive(false);   // NEW
     }
 
     public void PlayGame()
@@ -86,5 +98,24 @@ public class MainMenuScript : MonoBehaviour
 
         if (instructionsPanel != null)
             instructionsPanel.SetActive(false);
+    }
+
+    // ---------- NEW: STORY PANEL ----------
+    private void OpenStory()
+    {
+        if (clickSound != null)
+            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
+
+        if (storyPanel != null)
+            storyPanel.SetActive(true);
+    }
+
+    private void CloseStory()
+    {
+        if (clickSound != null)
+            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
+
+        if (storyPanel != null)
+            storyPanel.SetActive(false);
     }
 }
