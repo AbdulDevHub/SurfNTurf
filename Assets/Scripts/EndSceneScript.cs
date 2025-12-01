@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class EndScreenScript : MonoBehaviour
 {
@@ -62,20 +63,19 @@ public class EndScreenScript : MonoBehaviour
     private void QuitGame()
     {
         PlayClickSound();
-        Application.Quit();
-        Debug.Log("Quit Game");
+        StartCoroutine(QuitAfterDelay());
     }
 
     private void ReturnToMainMenu()
     {
         PlayClickSound();
-        SceneManager.LoadScene("MainMenu");
+        StartCoroutine(LoadSceneAfterDelay("MainMenu"));
     }
 
     private void PlayAgain()
     {
         PlayClickSound();
-        SceneManager.LoadScene("Game");
+        StartCoroutine(LoadSceneAfterDelay("Game"));
     }
 
     private void UpdateOutcome()
@@ -101,5 +101,17 @@ public class EndScreenScript : MonoBehaviour
 
         if (outcomeImage != null)
             outcomeImage.sprite = playerWon ? bearHappy : bearSad;
+    }
+
+    private IEnumerator LoadSceneAfterDelay(string sceneName)
+    {
+        yield return new WaitForSeconds(0.1f); // small delay so click sound can play
+        SceneManager.LoadScene(sceneName);
+    }
+
+    private IEnumerator QuitAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Application.Quit();
     }
 }

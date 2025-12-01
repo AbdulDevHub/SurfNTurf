@@ -57,6 +57,18 @@ public class InstructionPageController : MonoBehaviour
             });
     }
 
+    private void Update()
+    {
+        // ESC Key → Toggle Instruction Page (No Sound)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (!isOpen)
+                ShowInstructionPage();
+            else
+                HideInstructionPage();
+        }
+    }
+
 
     // ----------------------------
     // SHOW PAGE + PAUSE GAME

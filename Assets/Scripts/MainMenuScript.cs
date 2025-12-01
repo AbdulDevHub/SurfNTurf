@@ -7,6 +7,8 @@ public class MainMenuScript : MonoBehaviour
     [Header("Button Sounds")]
     [SerializeField] private AudioClip clickSound;
 
+    private AudioSource uiAudioSource;               // NEW → Dedicated 2D AudioSource for UI clicks
+
     [Header("Menu Music")]
     [SerializeField] private AudioClip menuMusic;
     private AudioSource musicSource;
@@ -25,17 +27,29 @@ public class MainMenuScript : MonoBehaviour
 
     void Start()
     {
+        // -----------------------------------
+        // Create a 2D AudioSource for UI clicks
+        // -----------------------------------
+        uiAudioSource = gameObject.AddComponent<AudioSource>();
+        uiAudioSource.spatialBlend = 0f;  // Force 2D sound
+        uiAudioSource.playOnAwake = false;
+
+        // -----------------------------------
         // Play menu music
+        // -----------------------------------
         if (menuMusic != null)
         {
             musicSource = gameObject.AddComponent<AudioSource>();
             musicSource.clip = menuMusic;
             musicSource.loop = true;
             musicSource.playOnAwake = false;
+            musicSource.spatialBlend = 0f; // Also 2D
             musicSource.Play();
         }
 
+        // -----------------------------------
         // Button listeners
+        // -----------------------------------
         if (playButton != null)
             playButton.onClick.AddListener(PlayGame);
 
@@ -62,10 +76,22 @@ public class MainMenuScript : MonoBehaviour
             storyPanel.SetActive(false);   // NEW
     }
 
-    public void PlayGame()
+    // -----------------------------------
+    // UI Button Sound
+    // -----------------------------------
+    private void PlayClickSound()
     {
         if (clickSound != null)
-            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
+            uiAudioSource.PlayOneShot(clickSound); // 2D sound → consistent volume!
+    }
+
+    // -----------------------------------
+    // Button functions
+    // -----------------------------------
+
+    public void PlayGame()
+    {
+        PlayClickSound();
 
         if (musicSource != null)
             musicSource.Stop();
@@ -75,17 +101,14 @@ public class MainMenuScript : MonoBehaviour
 
     public void QuitGame()
     {
-        if (clickSound != null)
-            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
-
+        PlayClickSound();
         Application.Quit();
         Debug.Log("Quit Game");
     }
 
     private void OpenInstructions()
     {
-        if (clickSound != null)
-            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
+        PlayClickSound();
 
         if (instructionsPanel != null)
             instructionsPanel.SetActive(true);
@@ -93,8 +116,7 @@ public class MainMenuScript : MonoBehaviour
 
     private void CloseInstructions()
     {
-        if (clickSound != null)
-            AudioSource.PlayClipAtPoint(clickSound, Vector3.zero);
+        PlayClickSound();
 
         if (instructionsPanel != null)
             instructionsPanel.SetActive(false);

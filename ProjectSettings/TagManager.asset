@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - TowerSpot
   - HiddenEnemy
+  - ScalesText
   layers:
   - Default
   - TransparentFX

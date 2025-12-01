@@ -11,7 +11,7 @@ public class StatManager : MonoBehaviour
     public TMP_Text scalesText;
 
     [Header("Default Stats")]
-    public int defaultScales = 10000;
+    public int defaultScales = 2500;
 
     // Stats
     [HideInInspector] public float totalTime = 0f;
@@ -61,11 +61,12 @@ public class StatManager : MonoBehaviour
     {
         if (scene.name == "Game")
         {
+            StartCoroutine(DelayedFindUI());
+
             playerHealth = FindAnyObjectByType<PlayerHealth>();
             totalTime = 0f;
             totalScore = 0;
             remainingScales = defaultScales;
-            UpdateScalesUI();
 
             if (playerHealth != null)
                 remainingHealth = playerHealth.currentHealth;
@@ -151,5 +152,18 @@ public class StatManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private IEnumerator DelayedFindUI()
+    {
+        // Wait 1 frame so the UI has time to spawn/enable
+        yield return null;
+
+        scalesText = GameObject.FindWithTag("ScalesText")?.GetComponent<TMP_Text>();
+
+        if (scalesText == null)
+            Debug.LogError("StatManager STILL could not find ScalesText after delay!");
+        else
+            UpdateScalesUI();
     }
 }
