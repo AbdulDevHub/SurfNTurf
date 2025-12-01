@@ -19,6 +19,12 @@ public class Enemy : MonoBehaviour
     public int CurrentHealth => currentHealth;
     public float Speed => speed;
 
+    private void Awake()
+    {
+        // Assign name automatically from the GameObject
+        enemyName = gameObject.name.Substring(0, gameObject.name.Length - 7);
+    }
+
     private void Start()
     {
         if (pathToFollow == null)
