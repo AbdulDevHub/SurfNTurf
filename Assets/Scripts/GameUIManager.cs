@@ -42,6 +42,9 @@ public class GameUIManager : MonoBehaviour
     private Coroutine upgradeButtonShakeCoroutine;
     private Coroutine sellButtonShakeCoroutine;
 
+    private Dictionary<Button, Color> defaultButtonColors = new Dictionary<Button, Color>();
+    private Button currentlySelectedTowerButton = null;
+
     void Awake()
     {
         if (Instance == null) 
@@ -51,6 +54,16 @@ public class GameUIManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        // Save default image colors for tower buttons
+        if (birdButton != null)
+            defaultButtonColors[birdButton] = birdButton.image.color;
+
+        if (bearButton != null)
+            defaultButtonColors[bearButton] = bearButton.image.color;
+
+        if (fishermanButton != null)
+            defaultButtonColors[fishermanButton] = fishermanButton.image.color;
 
         SetupButtonListeners();
         
@@ -132,6 +145,11 @@ public class GameUIManager : MonoBehaviour
 
     void SelectTowerType(string type)
     {
+        // Highlight correct UI button
+        if (type == "Bird") HighlightSelectedButton(birdButton);
+        else if (type == "Bear") HighlightSelectedButton(bearButton);
+        else if (type == "Fisherman") HighlightSelectedButton(fishermanButton);
+
         if (TowerSpotController.ActiveSpot != null && TowerSpotController.ActiveSpot.GetCurrentLevel() == 0)
         {
             PlayUISound("Tower Type Select");
@@ -225,12 +243,16 @@ public class GameUIManager : MonoBehaviour
             towerTypeUI.SetActive(true);
             
         selectedTowerTypeForPlacement = "";
+        HighlightSelectedButton(null);
     }
 
     public void HideTowerTypeUI()
     {
         if (towerTypeUI != null)
             towerTypeUI.SetActive(false);
+
+        // Reset highlight
+        HighlightSelectedButton(null);
     }
 
     public void ShowTowerInfoUI()
@@ -249,6 +271,7 @@ public class GameUIManager : MonoBehaviour
 
     public void ExitAllUI()
     {
+        HighlightSelectedButton(null);
         if (TowerSpotController.ActiveSpot != null)
             TowerSpotController.ActiveSpot.ExitUIFromUI();
 
@@ -405,5 +428,36 @@ public class GameUIManager : MonoBehaviour
         {
             UpdatePlacementInfoUI(selectedTowerTypeForPlacement);
         }
+    }
+
+    private void HighlightSelectedButton(Button selected)
+    {
+        // If selecting null → clear and exit
+        if (selected == null)
+        {
+            if (currentlySelectedTowerButton != null &&
+                defaultButtonColors.ContainsKey(currentlySelectedTowerButton))
+            {
+                currentlySelectedTowerButton.image.color =
+                    defaultButtonColors[currentlySelectedTowerButton];
+            }
+
+            currentlySelectedTowerButton = null;
+            return;
+        }
+
+        // Reset previous selection if there was one
+        if (currentlySelectedTowerButton != null &&
+            defaultButtonColors.ContainsKey(currentlySelectedTowerButton))
+        {
+            currentlySelectedTowerButton.image.color =
+                defaultButtonColors[currentlySelectedTowerButton];
+        }
+
+        // Apply highlight
+        selected.image.color = Color.white;
+
+        // Register new selected
+        currentlySelectedTowerButton = selected;
     }
 }
