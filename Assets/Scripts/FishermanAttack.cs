@@ -204,8 +204,7 @@ public class FishermanAttack : MonoBehaviour
                 if (!netOnCooldown && enemiesInRange.Count > 0 && activeNet == null)
                 {
                     DeployNet();
-                    netOnCooldown = true;
-                    StartCoroutine(NetCooldownTimer());
+                    // Don't start cooldown here - it starts after collection
                 }
 
                 yield return null;
@@ -507,6 +506,10 @@ public class FishermanAttack : MonoBehaviour
         currentNetSize = 0;
         netForceFull = false;
         netTimer = 0f;
+
+        // Start cooldown AFTER collecting the net
+        netOnCooldown = true;
+        StartCoroutine(NetCooldownTimer());
     }
 
     private Vector3 CalculateCenterPosition(List<Enemy> enemies)
