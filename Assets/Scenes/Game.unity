@@ -82947,7 +82947,7 @@ PrefabInstance:
       objectReference: {fileID: 8273646448304918479}
     - target: {fileID: 1717325146475460127, guid: f3c4ec7809f89c44789133bd2b58b7ce, type: 3}
       propertyPath: maxHealth
-      value: 5
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 1717325146475460127, guid: f3c4ec7809f89c44789133bd2b58b7ce, type: 3}
       propertyPath: healthText
@@ -82959,7 +82959,7 @@ PrefabInstance:
       objectReference: {fileID: 4330961618794042490}
     - target: {fileID: 1717325146475460127, guid: f3c4ec7809f89c44789133bd2b58b7ce, type: 3}
       propertyPath: currentHealth
-      value: 5
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4817323211969538242, guid: f3c4ec7809f89c44789133bd2b58b7ce, type: 3}
       propertyPath: m_Name
