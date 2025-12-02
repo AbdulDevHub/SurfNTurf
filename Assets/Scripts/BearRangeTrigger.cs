@@ -8,7 +8,9 @@ public class BearRangeTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Enemy") && !other.CompareTag("HiddenEnemy"))
+        if (!other.CompareTag("Enemy") && 
+            !other.CompareTag("HiddenEnemy") &&
+            !other.CompareTag("Boss"))
             return;
 
         Enemy enemy = other.GetComponent<Enemy>();
@@ -18,7 +20,9 @@ public class BearRangeTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Enemy") && !other.CompareTag("HiddenEnemy"))
+        if (!other.CompareTag("Enemy") && 
+            !other.CompareTag("HiddenEnemy") &&
+            !other.CompareTag("Boss"))
             return;
 
         Enemy enemy = other.GetComponent<Enemy>();

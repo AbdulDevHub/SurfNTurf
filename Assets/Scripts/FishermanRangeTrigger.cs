@@ -9,7 +9,9 @@ public class FishermanRangeTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("HiddenEnemy"))
+        if (other.CompareTag("Enemy") ||
+            other.CompareTag("HiddenEnemy") ||
+            other.CompareTag("Boss"))
         {
             Enemy enemy = other.GetComponent<Enemy>();
             if (enemy != null)
@@ -19,7 +21,9 @@ public class FishermanRangeTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("HiddenEnemy"))
+        if (other.CompareTag("Enemy") ||
+            other.CompareTag("HiddenEnemy") ||
+            other.CompareTag("Boss"))
         {
             Enemy enemy = other.GetComponent<Enemy>();
             if (enemy != null)

@@ -9,6 +9,7 @@ TagManager:
   - TowerSpot
   - HiddenEnemy
   - ScalesText
+  - Boss
   layers:
   - Default
   - TransparentFX

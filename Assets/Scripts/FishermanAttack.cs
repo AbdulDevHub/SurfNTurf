@@ -19,6 +19,10 @@ public class FishermanAttack : MonoBehaviour
     [Header("Net Prefab (Level 2 & 3)")]
     public GameObject netPrefab; // Assign your net visual prefab here
 
+    [Header("Boss Settings")]
+    public int bossDamagePerNet = 5; // Damage dealt to boss per net collection (LV2)
+    public int bossDamagePerNetLV3 = 10; // Damage dealt to boss per net collection (LV3)
+
     // Level-based stats
     private int damage;
     private float attackInterval;
@@ -158,7 +162,7 @@ public class FishermanAttack : MonoBehaviour
     private void HandleEnemyEnter(Enemy enemy)
     {
         // Block HiddenEnemy unless level 2+
-        if (enemy.CompareTag("HiddenEnemy") && fishermanLevel < 2)
+        if (!CanSeeEnemy(enemy))
             return;
 
         if (!enemiesInRange.Contains(enemy))
@@ -390,6 +394,9 @@ public class FishermanAttack : MonoBehaviour
         {
             if (enemy == null) continue;
 
+            // Bosses don't get trapped by additional catch logic
+            if (enemy.CompareTag("Boss")) continue;
+
             int fishSize = enemy.CurrentHealth;
 
             // Stop if net is force-full
@@ -427,6 +434,14 @@ public class FishermanAttack : MonoBehaviour
         {
             if (enemy == null) continue;
 
+            // Special handling for bosses
+            if (enemy.CompareTag("Boss"))
+            {
+                enemiesToTrap.Add(enemy);
+                netForceFull = true; // Boss fills the net
+                continue;
+            }
+
             int fishSize = enemy.CurrentHealth;
 
             // Stop if net is force-full
@@ -460,13 +475,25 @@ public class FishermanAttack : MonoBehaviour
 
     private void CollectNet()
     {
-        // Kill all trapped enemies
+        // Process each trapped enemy
         foreach (Enemy enemy in new List<Enemy>(trappedEnemies))
         {
             if (enemy != null)
             {
-                // Deal massive damage to kill the enemy instantly
-                enemy.TakeDamage(999);
+                // Special handling for bosses
+                if (enemy.CompareTag("Boss"))
+                {
+                    // Deal partial damage based on fisherman level
+                    int bossRealDamage = (fishermanLevel == 2) ? bossDamagePerNet : bossDamagePerNetLV3;
+                    enemy.TakeDamage(bossRealDamage);
+                    
+                    Debug.Log($"Boss took {bossRealDamage} damage from net. Remaining health: {enemy.CurrentHealth}");
+                }
+                else
+                {
+                    // Regular enemies get instant killed
+                    enemy.TakeDamage(999);
+                }
             }
         }
 
@@ -528,8 +555,12 @@ public class FishermanAttack : MonoBehaviour
     {
         if (enemy == null || trappedEnemies.Contains(enemy)) return;
 
-        int fishSize = enemy.CurrentHealth;
-        currentNetSize += fishSize;
+        // Don't count boss health toward net capacity
+        if (!enemy.CompareTag("Boss"))
+        {
+            int fishSize = enemy.CurrentHealth;
+            currentNetSize += fishSize;
+        }
 
         // Stop the enemy's NavMeshAgent
         UnityEngine.AI.NavMeshAgent agent = enemy.GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -551,8 +582,13 @@ public class FishermanAttack : MonoBehaviour
             // Check if enemy died naturally (not from collection)
             if (enemy.CurrentHealth <= 0)
             {
-                int fishSize = enemy.CurrentHealth;
-                currentNetSize -= fishSize;
+                // Don't subtract boss health from net size
+                if (!enemy.CompareTag("Boss"))
+                {
+                    int fishSize = enemy.CurrentHealth;
+                    currentNetSize -= fishSize;
+                }
+                
                 trappedEnemies.Remove(enemy);
                 
                 // Check if net should despawn (no more trapped enemies)
@@ -614,7 +650,11 @@ public class FishermanAttack : MonoBehaviour
     {
         if (enemy == null) return false;
 
-        // Block HiddenEnemy unless LV2+
+        // Fisherman can always detect bosses
+        if (enemy.CompareTag("Boss"))
+            return true;
+
+        // Hidden enemies require LV2+
         if (enemy.CompareTag("HiddenEnemy") && fishermanLevel < 2)
             return false;
 
@@ -632,7 +672,9 @@ public class FishermanAttack : MonoBehaviour
 
         foreach (var hit in hits)
         {
-            if (!hit.CompareTag("Enemy") && !hit.CompareTag("HiddenEnemy"))
+            if (!hit.CompareTag("Enemy") &&
+                !hit.CompareTag("HiddenEnemy") &&
+                !hit.CompareTag("Boss"))
                 continue;
 
             Enemy enemy = hit.GetComponent<Enemy>();

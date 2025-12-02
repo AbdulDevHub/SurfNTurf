@@ -111,6 +111,10 @@ public class BearAttack : MonoBehaviour
 
     private bool CanSeeEnemy(Enemy enemy)
     {
+        // Bears cannot see Hidden enemies except level 2, but can always see Boss
+        if (enemy.CompareTag("Boss"))
+            return true;
+
         return !(enemy.CompareTag("HiddenEnemy") && bearLevel != 2);
     }
 
@@ -242,7 +246,9 @@ public class BearAttack : MonoBehaviour
 
         foreach (var hit in hits)
         {
-            if (!hit.CompareTag("Enemy") && !hit.CompareTag("HiddenEnemy"))
+            if (!hit.CompareTag("Enemy") && 
+                !hit.CompareTag("HiddenEnemy") &&
+                !hit.CompareTag("Boss"))
                 continue;
 
             Enemy enemy = hit.GetComponent<Enemy>();

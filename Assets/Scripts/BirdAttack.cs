@@ -124,6 +124,10 @@ public class BirdAttack : MonoBehaviour
 
     private bool CanSeeEnemy(Enemy e)
     {
+        if (e.CompareTag("Boss"))
+            return true; // All birds can see Boss enemies
+
+        // Hidden enemies need level 2+
         return !(e.CompareTag("HiddenEnemy") && birdLevel < 2);
     }
 
@@ -271,7 +275,9 @@ public class BirdAttack : MonoBehaviour
 
         foreach (var hit in hits)
         {
-            if (!hit.CompareTag("Enemy") && !hit.CompareTag("HiddenEnemy"))
+            if (!hit.CompareTag("Enemy") && 
+                !hit.CompareTag("HiddenEnemy") &&
+                !hit.CompareTag("Boss"))
                 continue;
 
             Enemy enemy = hit.GetComponent<Enemy>();
