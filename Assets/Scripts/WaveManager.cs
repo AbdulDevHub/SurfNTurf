@@ -111,11 +111,17 @@ public class WaveManager : MonoBehaviour
             if (gameOver) yield break;
 
             EnemyPath path = wave.availablePaths[Random.Range(0, wave.availablePaths.Length)];
+            // Instantiate enemy
             GameObject enemyGO = Instantiate(prefab, path.GetSpawnPoint(), Quaternion.identity);
 
             Enemy enemy = enemyGO.GetComponent<Enemy>();
+
+            // Assign path BEFORE Start() logic depends on it
             if (enemy != null)
+            {
                 enemy.pathToFollow = path;
+                EnemyManager.aliveEnemies++;  // <-- FIX: Count enemy immediately
+            }
 
             yield return new WaitForSeconds(spawnInterval);
         }

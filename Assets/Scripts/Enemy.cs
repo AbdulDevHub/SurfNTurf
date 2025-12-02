@@ -27,31 +27,30 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        if (pathToFollow == null)
-        {
-            Debug.LogError("Enemy spawned without a path!");
-            Destroy(gameObject);
-            return;
-        }
-
         agent = GetComponent<NavMeshAgent>();
         currentHealth = maxHealth;
         agent.speed = speed;
 
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(pathToFollow.GetSpawnPoint(), out hit, 1f, NavMesh.AllAreas))
-            agent.Warp(hit.position);
+        // Do NOT destroy the enemy if path is not assigned yet.
+        // Just wait until WaveManager assigns it.
+        if (pathToFollow == null)
+        {
+            Debug.LogWarning($"{enemyName} spawned without path yet — waiting for assignment.");
+            return;
+        }
 
-        waypoints = pathToFollow.nodes;
-        if (waypoints.Length > 0)
-            agent.destination = waypoints[waypointIndex].position;
-
-        EnemyManager.aliveEnemies++;
+        InitializeMovement();
     }
 
     private void Update()
     {
-        if (waypoints == null || waypoints.Length == 0 || agent.pathPending) return;
+        // If the path was not ready at Start(), initialize when it becomes available
+        if (pathToFollow != null && agent.destination == Vector3.zero)
+        {
+            InitializeMovement();
+        }
+
+        if (waypoints == null || agent.pathPending) return;
 
         if (agent.remainingDistance <= agent.stoppingDistance)
         {
@@ -61,6 +60,18 @@ public class Enemy : MonoBehaviour
             else
                 ReachGoal();
         }
+    }
+
+    private void InitializeMovement()
+    {
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(pathToFollow.GetSpawnPoint(), out hit, 1f, NavMesh.AllAreas))
+            agent.Warp(hit.position);
+
+        waypoints = pathToFollow.nodes;
+
+        if (waypoints.Length > 0)
+            agent.destination = waypoints[waypointIndex].position;
     }
 
     public void TakeDamage(int amount)
