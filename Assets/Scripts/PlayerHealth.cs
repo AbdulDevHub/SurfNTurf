@@ -18,6 +18,9 @@ public class PlayerHealth : MonoBehaviour
     public float shakeDuration = 0.2f;
     public float shakeStrength = 6f;
 
+    [Header("Cheat Mode")]
+    private bool isInvincible = false;
+
     private Vector2 redOriginalPos;
     private Coroutine healthAnimRoutine;
     private Coroutine shakeRoutine;
@@ -31,8 +34,22 @@ public class PlayerHealth : MonoBehaviour
             redOriginalPos = healthRed.rectTransform.anchoredPosition;
     }
 
+    // Public method to enable/disable invincibility
+    public void SetInvincibility(bool enabled)
+    {
+        isInvincible = enabled;
+        Debug.Log(enabled ? "Player is now INVINCIBLE!" : "Player invincibility DISABLED");
+    }
+
     public void TakeDamage(int amount)
     {
+        // If invincible, ignore all damage
+        if (isInvincible)
+        {
+            Debug.Log($"Damage blocked by invincibility! ({amount} damage ignored)");
+            return;
+        }
+
         int oldHealth = currentHealth;
 
         currentHealth -= amount;

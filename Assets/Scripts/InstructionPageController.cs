@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using TMPro;
 
 public class InstructionPageController : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class InstructionPageController : MonoBehaviour
     public GameObject instructionPage;      
     public Button gearButton;               
     public Button backButton;               
-    public Button quitButton;               // Quit game
+    public Button cheatButton;              // Cheat toggle (formerly quit)
     public Button mainMenuButton;           // Load MainMenu scene
 
     [Header("Animation Settings")]
@@ -17,6 +18,7 @@ public class InstructionPageController : MonoBehaviour
     public float fadeDuration = 0.25f;
 
     private bool isOpen = false;
+    private bool isCheatActive = false;
 
     private void Start()
     {
@@ -42,12 +44,17 @@ public class InstructionPageController : MonoBehaviour
                 HideInstructionPage();
             });
 
-        if (quitButton != null)
-            quitButton.onClick.AddListener(() =>
+        if (cheatButton != null)
+        {
+            cheatButton.onClick.AddListener(() =>
             {
                 SoundManager.Instance.PlaySound("Button Click");
-                QuitGame();
+                ToggleCheat();
             });
+            
+            // Update button appearance initially
+            UpdateCheatButtonAppearance();
+        }
 
         if (mainMenuButton != null)
             mainMenuButton.onClick.AddListener(() =>
@@ -69,6 +76,32 @@ public class InstructionPageController : MonoBehaviour
         }
     }
 
+    // ----------------------------
+    // CHEAT TOGGLE
+    // ----------------------------
+    private void ToggleCheat()
+    {
+        isCheatActive = !isCheatActive;
+        
+        // Update PlayerHealth to use cheat mode
+        PlayerHealth player = Object.FindFirstObjectByType<PlayerHealth>();
+        if (player != null)
+            player.SetInvincibility(isCheatActive);
+        
+        UpdateCheatButtonAppearance();
+        
+        Debug.Log($"Cheat Mode: {(isCheatActive ? "ACTIVE" : "INACTIVE")}");
+    }
+
+    private void UpdateCheatButtonAppearance()
+    {
+        if (cheatButton == null) return;
+
+        // Update button text if it has a TMP_Text component
+        TMP_Text buttonText = cheatButton.GetComponentInChildren<TMP_Text>();
+        if (buttonText != null)
+            buttonText.text = isCheatActive ? "Cheat: ON" : "Cheat: OFF";
+    }
 
     // ----------------------------
     // SHOW PAGE + PAUSE GAME
@@ -101,20 +134,18 @@ public class InstructionPageController : MonoBehaviour
     }
 
     // ----------------------------
-    // QUIT GAME
-    // ----------------------------
-    private void QuitGame()
-    {
-        Debug.Log("Quit Game");
-        Application.Quit();
-    }
-
-    // ----------------------------
     // LOAD MAIN MENU
     // ----------------------------
     private void LoadMainMenu()
     {
         Time.timeScale = 1f;  // Ensure game is unpaused
+        
+        // Reset cheat when returning to main menu
+        isCheatActive = false;
+        PlayerHealth player = Object.FindFirstObjectByType<PlayerHealth>();
+        if (player != null)
+            player.SetInvincibility(false);
+        
         SceneManager.LoadScene("MainMenu");
     }
 
