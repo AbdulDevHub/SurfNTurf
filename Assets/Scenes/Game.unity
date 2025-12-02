@@ -45664,11 +45664,11 @@ MonoBehaviour:
     is3D: 0
   - soundName: Dam Explosion
     clip: {fileID: 8300000, guid: 5ab41bb09cf974f46af83030f89a66c3, type: 3}
-    volume: 0.5
+    volume: 0.25
     is3D: 0
   - soundName: Fish Killed
     clip: {fileID: 8300000, guid: 9615b3f6c35643b48a788b6ecc0410b7, type: 3}
-    volume: 0.5
+    volume: 0.25
     is3D: 0
   - soundName: Fish Net LV1
     clip: {fileID: 8300000, guid: d49f023a1b53bdb4a8cd4351c0d489f4, type: 3}
@@ -45750,7 +45750,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: bd293d16c9710484da23a03119108734, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.507
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0

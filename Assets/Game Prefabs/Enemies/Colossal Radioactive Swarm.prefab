@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: -5029632783084754156}
   m_Layer: 0
   m_Name: Colossal Radioactive Swarm
-  m_TagString: Boss
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -394,7 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   pathToFollow: {fileID: 0}
-  maxHealth: 200
+  maxHealth: 300
   speed: 1
   enemyName: 
   currentHealth: 0

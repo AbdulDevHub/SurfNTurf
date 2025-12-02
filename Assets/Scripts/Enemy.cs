@@ -72,12 +72,16 @@ public class Enemy : MonoBehaviour
         // Add score/scales for the **actual damage dealt**
         int damageDone = previousHealth - currentHealth;
         if (StatManager.Instance != null && damageDone > 0)
+        {
+            StatManager.Instance.AddScore(damageDone);  
+        }
 
-        if (currentHealth <= 0)
-            StatManager.Instance.AddScore(damageDone);
+        if (currentHealth <= 0) {
+   
             StatManager.Instance.AddScales(100);
 
             Die();
+        }
     }
 
     private void Die()
