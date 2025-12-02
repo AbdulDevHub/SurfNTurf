@@ -319,10 +319,25 @@ public class FishermanAttack : MonoBehaviour
                 TryCatchAdditionalFish();
             }
 
-            // Check if net duration expired or net is full
-            if (netTimer >= netDuration || IsNetFull())
+            // Check if net duration expired
+            // For bosses, always wait for full duration
+            bool hasBoss = trappedEnemies.Exists(e => e != null && e.CompareTag("Boss"));
+            
+            if (hasBoss)
             {
-                StartCoroutine(CollectNetDelayed());
+                // Boss: only collect after full duration
+                if (netTimer >= netDuration)
+                {
+                    StartCoroutine(CollectNetDelayed());
+                }
+            }
+            else
+            {
+                // Regular fish: collect when full or duration expired
+                if (netTimer >= netDuration || IsNetFull())
+                {
+                    StartCoroutine(CollectNetDelayed());
+                }
             }
         }
     }
@@ -496,8 +511,8 @@ public class FishermanAttack : MonoBehaviour
             }
         }
 
-        // Clear trapped enemies list
-        trappedEnemies.Clear();
+        // Release all trapped enemies (resume their movement)
+        ReleaseAllTrappedEnemies();
 
         // Despawn the net
         DespawnNet();

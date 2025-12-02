@@ -1932,6 +1932,8 @@ MonoBehaviour:
   rodDownAngle: 45
   rodUpAngle: -30
   netPrefab: {fileID: 0}
+  bossDamagePerNet: 5
+  bossDamagePerNetLV3: 10
 --- !u!4 &6323352427081385383 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7344296536100800118, guid: 9e21c44674f0d654a80af29da10304ea, type: 3}
@@ -2440,11 +2442,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FishermanAttack
   fishermanLevel: 3
   rangeTrigger: {fileID: 8714367724279949416}
-  fishingRod: {fileID: 0}
+  fishingRod: {fileID: 2416952669777971135}
   rodSwingSpeed: 2
   rodDownAngle: 45
   rodUpAngle: -30
   netPrefab: {fileID: 3864373075888587445}
+  bossDamagePerNet: 5
+  bossDamagePerNetLV3: 10
+--- !u!4 &2416952669777971135 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4849030885643127774, guid: 9e21c44674f0d654a80af29da10304ea, type: 3}
+  m_PrefabInstance: {fileID: 7116120910794607713}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4901860119925590152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2794322546843305193, guid: 9e21c44674f0d654a80af29da10304ea, type: 3}
@@ -2588,6 +2597,8 @@ MonoBehaviour:
   rodDownAngle: 45
   rodUpAngle: -30
   netPrefab: {fileID: 4729542618672067220}
+  bossDamagePerNet: 5
+  bossDamagePerNetLV3: 10
 --- !u!4 &4725628541742795499 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2794322546843305193, guid: 9e21c44674f0d654a80af29da10304ea, type: 3}
