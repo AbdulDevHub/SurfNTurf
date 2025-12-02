@@ -141,8 +141,8 @@ public class BirdAttack : MonoBehaviour
         {
             CleanupNullEnemies();
 
-            if (currentTarget == null)
-                currentTarget = SelectNextTarget();
+            // Always choose the closest enemy before every attack
+            currentTarget = SelectNextTarget();
 
             if (currentTarget == null)
             {
@@ -150,8 +150,10 @@ public class BirdAttack : MonoBehaviour
                 continue;
             }
 
+            // Perform the attack sequence
             yield return StartCoroutine(DoAttackSequence());
 
+            // If target died after attack, remove it
             if (currentTarget != null && currentTarget.CurrentHealth <= 0)
             {
                 enemiesInRange.Remove(currentTarget);
@@ -173,37 +175,50 @@ public class BirdAttack : MonoBehaviour
 
         SoundManager.Instance.PlaySound("Bird Attack", transform.position);
 
-        // Move to enemy
+        // Move toward the enemy
         yield return StartCoroutine(MoveToEnemy());
 
-        // Deal damage IF still valid target
+        // Attack instantly (if target still valid)
         if (currentTarget != null)
             currentTarget.TakeDamage(damage);
 
-        // Attack cooldown
-        yield return new WaitForSeconds(attackInterval);
-
-        // Return home
+        // Return home BEFORE cooldown
         yield return StartCoroutine(ReturnHome());
+
+        // Cooldown at home
+        yield return new WaitForSeconds(attackInterval);
     }
 
     private IEnumerator MoveToEnemy()
     {
-        while (currentTarget != null)
+        while (true)
         {
+            if (currentTarget == null || !CanSeeEnemy(currentTarget))
+                yield break;
+
             Vector3 enemyPos = currentTarget.transform.position;
+
             Vector3 dir = (enemyPos - transform.position).normalized;
             Vector3 attackPos = enemyPos - dir * attackDistance;
 
             // Rotate toward enemy
             Quaternion lookRot = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                lookRot,
+                rotationSpeed * Time.deltaTime
+            );
 
-            // Move toward attack position
-            transform.position = Vector3.MoveTowards(transform.position, attackPos, attackMoveSpeed * Time.deltaTime);
+            // Move toward desired attack position
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                attackPos,
+                attackMoveSpeed * Time.deltaTime
+            );
 
+            // Reached attack position
             if (Vector3.Distance(transform.position, attackPos) < 0.1f)
-                break;
+                yield break;
 
             yield return null;
         }
@@ -211,7 +226,7 @@ public class BirdAttack : MonoBehaviour
 
     private IEnumerator ReturnHome()
     {
-        while (Vector3.Distance(transform.position, originalPosition) > 0.1f)
+        while (Vector3.Distance(transform.position, originalPosition) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(
                 transform.position,
@@ -219,9 +234,17 @@ public class BirdAttack : MonoBehaviour
                 returnMoveSpeed * Time.deltaTime
             );
 
+            // Rotate back to original rotation
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                originalRotation,
+                rotationSpeed * Time.deltaTime
+            );
+
             yield return null;
         }
 
+        // Snap to perfect home pose at the end
         ResetTransform();
     }
 
