@@ -49090,7 +49090,6 @@ GameObject:
   m_Component:
   - component: {fileID: 591375312}
   - component: {fileID: 591375311}
-  - component: {fileID: 591375313}
   m_Layer: 0
   m_Name: SoundManager
   m_TagString: Untagged
@@ -49198,103 +49197,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &591375313
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591375310}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: bd293d16c9710484da23a03119108734, type: 3}
-  m_PlayOnAwake: 1
-  m_Volume: 0.25
-  m_Pitch: 1
-  Loop: 1
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &597134644 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4737701693259412100, guid: eaea89974c681b34cb7cfd842b104463, type: 3}
@@ -152447,6 +152349,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1342488383}
   - component: {fileID: 1342488382}
+  - component: {fileID: 1342488384}
   m_Layer: 0
   m_Name: WaveManager
   m_TagString: Untagged
@@ -152505,7 +152408,7 @@ MonoBehaviour:
     waveMessage: Wave 4 complete! More fish are coming!
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
-      count: 1
+      count: 0
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
       count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 585b54200b1a3a842964f71bbf27fe1d, type: 3}
@@ -152531,17 +152434,17 @@ MonoBehaviour:
     waveMessage: Wave 6 complete!
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
-      count: 2
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
-      count: 3
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 585b54200b1a3a842964f71bbf27fe1d, type: 3}
       count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: c6655946edc9b5a44916c39dd0b9c9d2, type: 3}
       count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
-      count: 2
+      count: 5
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
-      count: 2
+      count: 1
     availablePaths:
     - {fileID: 883655670}
     delayAfterWave: 5
@@ -152550,15 +152453,15 @@ MonoBehaviour:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
       count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
-      count: 3
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 585b54200b1a3a842964f71bbf27fe1d, type: 3}
-      count: 2
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: c6655946edc9b5a44916c39dd0b9c9d2, type: 3}
       count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
-      count: 5
+      count: 10
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
-      count: 5
+      count: 1
     availablePaths:
     - {fileID: 883655670}
     delayAfterWave: 10
@@ -152652,17 +152555,17 @@ MonoBehaviour:
     waveMessage: Wave 14 complete! The dam is weakening...
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 6d76d3a49fcd708438ed4fffc7927e58, type: 3}
-      count: 4
+      count: 2
     - enemyPrefab: {fileID: 7017039098018598529, guid: dc5c5e83aed090546803a161576f4ba0, type: 3}
-      count: 4
+      count: 2
     - enemyPrefab: {fileID: 7017039098018598529, guid: b31967dc692c9cb4c8a808704d278473, type: 3}
-      count: 4
+      count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
-      count: 5
+      count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 7619427092adc884caabb6b9a2fb2f9f, type: 3}
-      count: 5
+      count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 268cda0e6eaa78e4cb8667f667b80987, type: 3}
-      count: 10
+      count: 15
     availablePaths:
     - {fileID: 883655670}
     - {fileID: 1770876696}
@@ -152792,6 +152695,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1342488384
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342488381}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: bd293d16c9710484da23a03119108734, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.25
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &1348395289 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7106354820743899756, guid: eaea89974c681b34cb7cfd842b104463, type: 3}

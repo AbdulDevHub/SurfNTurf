@@ -78,7 +78,7 @@ public class Enemy : MonoBehaviour
 
         if (currentHealth <= 0) {
    
-            StatManager.Instance.AddScales(100);
+            StatManager.Instance.AddScales(150);
 
             Die();
         }
