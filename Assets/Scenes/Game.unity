@@ -146355,14 +146355,14 @@ MonoBehaviour:
   waves:
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
-      count: 3
+      count: 1
     availablePaths:
     - {fileID: 883655670}
     delayAfterWave: 5
     waveMessage: Wave 1 complete! More fish are coming!
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
-      count: 5
+      count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: c6655946edc9b5a44916c39dd0b9c9d2, type: 3}
       count: 2
     availablePaths:

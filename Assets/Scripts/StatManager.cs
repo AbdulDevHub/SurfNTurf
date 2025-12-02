@@ -128,7 +128,7 @@ public class StatManager : MonoBehaviour
     public void AddScore(int amount)
     {
         totalScore += amount;
-        AddScales(amount * 100); // Multiply by 100 for scales
+        AddScales(amount * 50); // Multiply by 100 for scales
     }
 
     private void RefreshTowerUI()
