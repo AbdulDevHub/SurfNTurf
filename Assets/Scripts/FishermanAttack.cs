@@ -629,7 +629,7 @@ public class FishermanAttack : MonoBehaviour
             {
                 // Resume the enemy's NavMeshAgent
                 UnityEngine.AI.NavMeshAgent agent = enemy.GetComponent<UnityEngine.AI.NavMeshAgent>();
-                if (agent != null)
+                if (agent != null && agent.isOnNavMesh && agent.enabled)
                 {
                     agent.isStopped = false;
                 }
