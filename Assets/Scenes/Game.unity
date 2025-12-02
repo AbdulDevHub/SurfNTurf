@@ -30222,11 +30222,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4470861824277358, guid: 8436d7ae09cab4044be3b54f62027f31, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.19
+      value: 0.0000019073486
       objectReference: {fileID: 0}
     - target: {fileID: 4470861824277358, guid: 8436d7ae09cab4044be3b54f62027f31, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: -4.0727577
       objectReference: {fileID: 0}
     - target: {fileID: 4470861824277358, guid: 8436d7ae09cab4044be3b54f62027f31, type: 3}
       propertyPath: m_LocalRotation.w
@@ -88517,15 +88517,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5616264944597439129, guid: 7243c73ad9c1bd0489f591bd2fef3fce, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 27.85
+      value: 27.437965
       objectReference: {fileID: 0}
     - target: {fileID: 5616264944597439129, guid: 7243c73ad9c1bd0489f591bd2fef3fce, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.31
+      value: -0.0000019073486
       objectReference: {fileID: 0}
     - target: {fileID: 5616264944597439129, guid: 7243c73ad9c1bd0489f591bd2fef3fce, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.23
+      value: -5.350935
       objectReference: {fileID: 0}
     - target: {fileID: 5616264944597439129, guid: 7243c73ad9c1bd0489f591bd2fef3fce, type: 3}
       propertyPath: m_LocalRotation.w
@@ -152407,13 +152407,11 @@ MonoBehaviour:
     delayAfterWave: 5
     waveMessage: Wave 4 complete! More fish are coming!
   - enemies:
-    - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
-      count: 0
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+      count: 5
     - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
       count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: 585b54200b1a3a842964f71bbf27fe1d, type: 3}
-      count: 1
-    - enemyPrefab: {fileID: 7017039098018598529, guid: c6655946edc9b5a44916c39dd0b9c9d2, type: 3}
       count: 1
     availablePaths:
     - {fileID: 883655670}
@@ -152422,8 +152420,8 @@ MonoBehaviour:
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
       count: 1
-    - enemyPrefab: {fileID: 7017039098018598529, guid: 51c8dc4a6689fdd4d9c2e187afa041b5, type: 3}
-      count: 2
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+      count: 3
     - enemyPrefab: {fileID: 7017039098018598529, guid: 585b54200b1a3a842964f71bbf27fe1d, type: 3}
       count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: c6655946edc9b5a44916c39dd0b9c9d2, type: 3}
@@ -152521,15 +152519,15 @@ MonoBehaviour:
     waveMessage: 'Wave 12 complete! '
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 6d76d3a49fcd708438ed4fffc7927e58, type: 3}
-      count: 3
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: dc5c5e83aed090546803a161576f4ba0, type: 3}
-      count: 2
+      count: 1
     - enemyPrefab: {fileID: 7017039098018598529, guid: b31967dc692c9cb4c8a808704d278473, type: 3}
-      count: 2
-    - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
-      count: 5
+      count: 1
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+      count: 10
     - enemyPrefab: {fileID: 7017039098018598529, guid: 7619427092adc884caabb6b9a2fb2f9f, type: 3}
-      count: 5
+      count: 2
     availablePaths:
     - {fileID: 883655670}
     - {fileID: 1770876696}
@@ -152537,13 +152535,13 @@ MonoBehaviour:
     waveMessage: 'Wave 13 complete! '
   - enemies:
     - enemyPrefab: {fileID: 7017039098018598529, guid: 6d76d3a49fcd708438ed4fffc7927e58, type: 3}
-      count: 3
-    - enemyPrefab: {fileID: 7017039098018598529, guid: dc5c5e83aed090546803a161576f4ba0, type: 3}
-      count: 3
-    - enemyPrefab: {fileID: 7017039098018598529, guid: b31967dc692c9cb4c8a808704d278473, type: 3}
-      count: 3
-    - enemyPrefab: {fileID: 7017039098018598529, guid: 812434ed52442574fb752a1e8090e62a, type: 3}
       count: 2
+    - enemyPrefab: {fileID: 7017039098018598529, guid: dc5c5e83aed090546803a161576f4ba0, type: 3}
+      count: 1
+    - enemyPrefab: {fileID: 7017039098018598529, guid: b31967dc692c9cb4c8a808704d278473, type: 3}
+      count: 2
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+      count: 6
     - enemyPrefab: {fileID: 7017039098018598529, guid: 7619427092adc884caabb6b9a2fb2f9f, type: 3}
       count: 2
     - enemyPrefab: {fileID: 7017039098018598529, guid: 268cda0e6eaa78e4cb8667f667b80987, type: 3}
@@ -174847,6 +174845,181 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 299e7a1cb6456cf4fa6079cf5978df9b, type: 3}
+--- !u!1 &1811373619
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1811373622}
+  - component: {fileID: 1811373621}
+  - component: {fileID: 1811373620}
+  m_Layer: 0
+  m_Name: WaveManager (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!82 &1811373620
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811373619}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: bd293d16c9710484da23a03119108734, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.25
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1811373621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811373619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7179127664d206b4aa2f4be90a97f805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveManager
+  waves:
+  - enemies:
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+      count: 1
+    availablePaths:
+    - {fileID: 883655670}
+    delayAfterWave: 5
+    waveMessage: Wave 1 complete! More fish are coming!
+  - enemies:
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 52e49831a16d62f42b60b582e9b0e37d, type: 3}
+      count: 1
+    availablePaths:
+    - {fileID: 253457984}
+    delayAfterWave: 5
+    waveMessage: Wave 1 complete! More fish are coming!
+  waveText: {fileID: 9094926646992150270}
+  countdownText: {fileID: 7304430260229559053}
+  waveMessagePanel: {fileID: 9178119031845920514}
+  waveMessageText: {fileID: 1314617518185228724}
+  timeBeforeFirstWave: 5
+  spawnInterval: 0.5
+  dam1BreakWave: 8
+  dam2BreakWave: 15
+  dam1Message: The Dam Broke!
+  dam2Message: The Dam Broke!
+  dam1: {fileID: 919132149155446097, guid: 004e39c96737c104bba789f079d5f222, type: 3}
+  dam2: {fileID: 919132149155446097, guid: 004e39c96737c104bba789f079d5f222, type: 3}
+  dam1Mesh: {fileID: 1384094390}
+  dam2Mesh: {fileID: 337755892}
+  dam1Explosion: {fileID: 701916360}
+  dam2Explosion: {fileID: 1846028595}
+  shakeDuration: 0.3
+  shakeMagnitude: 0.3
+--- !u!4 &1811373622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811373619}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 363.34857, y: 194.69461, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1817049059 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6973656007204858427, guid: b3f8d051fb370c344be42e3885806e11, type: 3}
@@ -196334,6 +196507,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 2049674062}
   - {fileID: 1342488383}
+  - {fileID: 1811373622}
   - {fileID: 775655804}
   - {fileID: 591375312}
   - {fileID: 5056994079574498261}
