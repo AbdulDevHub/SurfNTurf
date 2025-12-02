@@ -113,6 +113,8 @@ public class FishermanAttack : MonoBehaviour
             rangeTriggerScript.OnEnemyExit += HandleEnemyExit;
         }
 
+        DetectInitialEnemies();
+
         // Start the attack routine when enabled
         if (attackCoroutine == null)
         {
@@ -606,5 +608,36 @@ public class FishermanAttack : MonoBehaviour
         yield return new WaitForSeconds(0.5f); // Adjust as needed (0.3–0.8 sec works great)
 
         CollectNet();
+    }
+
+    private bool CanSeeEnemy(Enemy enemy)
+    {
+        if (enemy == null) return false;
+
+        // Block HiddenEnemy unless LV2+
+        if (enemy.CompareTag("HiddenEnemy") && fishermanLevel < 2)
+            return false;
+
+        return true;
+    }
+
+    private void DetectInitialEnemies()
+    {
+        // Use the collider's AABB bounds to find enemies
+        Collider[] hits = Physics.OverlapBox(
+            rangeTrigger.bounds.center,
+            rangeTrigger.bounds.extents,
+            rangeTrigger.transform.rotation
+        );
+
+        foreach (var hit in hits)
+        {
+            if (!hit.CompareTag("Enemy") && !hit.CompareTag("HiddenEnemy"))
+                continue;
+
+            Enemy enemy = hit.GetComponent<Enemy>();
+            if (enemy != null && CanSeeEnemy(enemy))
+                HandleEnemyEnter(enemy);
+        }
     }
 }

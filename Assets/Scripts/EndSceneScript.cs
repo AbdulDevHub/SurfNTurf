@@ -105,13 +105,17 @@ public class EndScreenScript : MonoBehaviour
 
     private IEnumerator LoadSceneAfterDelay(string sceneName)
     {
-        yield return new WaitForSeconds(0.1f); // small delay so click sound can play
+        yield return new WaitForSecondsRealtime(0.1f); // ⬅️ Changed
+        
+        // Reset timeScale before loading new scene
+        Time.timeScale = 1f;
+        
         SceneManager.LoadScene(sceneName);
     }
 
     private IEnumerator QuitAfterDelay()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f); // ⬅️ Changed
         Application.Quit();
     }
 }

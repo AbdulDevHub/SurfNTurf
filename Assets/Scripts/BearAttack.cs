@@ -65,6 +65,8 @@ public class BearAttack : MonoBehaviour
             rangeTriggerScript.OnEnemyExit += HandleEnemyExit;
         }
 
+        DetectInitialEnemies();
+
         attackRoutine = StartCoroutine(AttackLoop());
     }
 
@@ -227,5 +229,25 @@ public class BearAttack : MonoBehaviour
         }
 
         return closest;
+    }
+
+    private void DetectInitialEnemies()
+    {
+        // Use the collider's AABB bounds to find enemies
+        Collider[] hits = Physics.OverlapBox(
+            rangeTrigger.bounds.center,
+            rangeTrigger.bounds.extents,
+            rangeTrigger.transform.rotation
+        );
+
+        foreach (var hit in hits)
+        {
+            if (!hit.CompareTag("Enemy") && !hit.CompareTag("HiddenEnemy"))
+                continue;
+
+            Enemy enemy = hit.GetComponent<Enemy>();
+            if (enemy != null && CanSeeEnemy(enemy))
+                HandleEnemyEnter(enemy);
+        }
     }
 }
