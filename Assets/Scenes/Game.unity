@@ -146354,7 +146354,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   waves:
   - enemies:
-    - enemyPrefab: {fileID: 7017039098018598529, guid: 69db2933386781d4d8c30a991bf41ee2, type: 3}
+    - enemyPrefab: {fileID: 7017039098018598529, guid: 52e49831a16d62f42b60b582e9b0e37d, type: 3}
       count: 1
     availablePaths:
     - {fileID: 883655670}
